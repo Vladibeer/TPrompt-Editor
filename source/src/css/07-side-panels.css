@@ -1,0 +1,14 @@
+/* ======================================================================
+   Странични панели: текстове и отметки
+   ====================================================================== */
+#bmPanel .bmhead{position:sticky;top:0;z-index:3;background:var(--panel)}
+.ptitle i[data-ic]{color:var(--acc);width:16px;height:16px}
+.bmi .ib svg{width:15px;height:15px}
+@media (max-width:900px){
+  #bmSide.open,#bmRSide.open{transform:none}
+}
+#scList .bmi .tt,#bmListEdit .bmi .tt{cursor:pointer}
+#bmRSide .bmsec{animation:slideInRight var(--t-slow) ease}
+#bmSide .scsec,#editor,#remote:not([hidden]),#bmPanel .ptitle,#bmPanel #bmListRead,#bmPanel #scReadSec{animation:slideIn var(--t-slow) ease}
+#bmPanel.open,#bmPanel[data-tab=sc].open{transform:none}
+#bmPanel[data-tab=bm] .ptitle,#bmPanel[data-tab=bm] #bmListRead{animation-name:slideInRight}

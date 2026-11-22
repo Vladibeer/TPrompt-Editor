@@ -1,0 +1,46 @@
+/* ======================================================================
+   Горна лента и падащи менюта
+   ====================================================================== */
+.grow{flex:1}
+.top{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-2) var(--sp-4);background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:nowrap;min-width:0}
+.brand{display:flex;align-items:center;gap:var(--sp-3);margin-right:var(--sp-3)}
+.brand .logo{width:34px;height:34px;display:block}
+#openWrap{display:inline-grid;grid-auto-flow:column;grid-auto-columns:auto;gap:var(--sp-2)}
+#openWrap .btn{justify-content:center;white-space:nowrap}
+@media (min-width:641px){
+  /* Широк екран (Windows и Android): петте бутона са събрани в една група, а средният („Пусни“) е точно в средата на прозореца.
+     Двете крайни колони са равни, затова групата е центрирана; логото е в лявата колона. */
+  header.top{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto minmax(0,1fr);column-gap:var(--sp-2)}
+  header.top>.topL{display:contents}
+  header.top .brand{grid-column:1;justify-self:start}
+  header.top .viewtog{grid-column:2}
+  header.top>#openWrap{grid-column:3}
+  header.top>.grp:last-child{grid-column:4}
+  header.top>.grow{display:none}
+}
+@media (min-width:641px) and (max-width:760px){
+  /* малко по-широко от телефонната лента: логото се скрива, за да остане „Пусни“ точно в средата */
+  header.top .brand{display:none}
+}
+.top .grp,.menu button i[data-ic]{flex:none}
+.menuwrap{position:relative}
+.menu button[aria-pressed="true"]{font-weight:800}
+.menu button{display:flex;width:100%;align-items:center;gap:var(--sp-3);padding:var(--sp-2) var(--sp-3);background:none;border:0;text-align:left;font-weight:600}
+.menu button:hover{background:var(--hover)}
+.menu[hidden],.menu button[hidden]{display:none}
+.menu button kbd{margin-left:auto;flex:none;color:var(--mute)}
+.menu small{display:block;color:var(--mute);font-weight:500;font-size:var(--fs-sm)}
+@media (max-width:900px){
+  /* управление на текста на компютъра: редакторът, текстовете, настройките и пускането са на устройството и не важат тук */
+  /* „Редактор“, „Пусни“ и „Настройки“ са винаги видими: интерфейсът на основния прозорец е един и същ */
+  /* малък екран: горе е избраният панел (редактор, отметки или настройки), еднакви по размер и фон; при дистанционно долу остава превюто */
+  body:is(.rc,.nt) .top{position:relative;z-index:40}   /* менютата от лентата са над панелите */
+}
+@media (min-width:641px){
+  .top .btn .t{overflow:hidden;text-overflow:ellipsis}
+}
+@media (max-width:640px){
+  .top::-webkit-scrollbar{display:none}
+}
+header.top .btn:focus-visible{outline:2px solid var(--acc)}
+header.top .btn i[data-ic]{width:20px;height:20px}

@@ -1,0 +1,32 @@
+/* ======================================================================
+   Лента за форматиране, избор на цвят и размер
+   ====================================================================== */
+.ib .chip{position:absolute;left:9px;right:9px;bottom:4px;height:3px;border-radius:var(--r-xs);background:#fff}
+.ddm[hidden]{display:none}
+.ddm .it{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding:var(--sp-2) var(--sp-3);cursor:pointer;font-weight:500;white-space:nowrap;user-select:none}
+.ddm .it[aria-selected="true"]{font-weight:800;color:var(--acc)}
+.ddm .it svg{width:15px;height:15px;flex:none;opacity:0;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.ddm .it[aria-selected="true"] svg{opacity:1}
+.szbox:hover,.szbox:focus-within{background:var(--hover)}
+.szbox input{width:38px;height:100%;min-width:0;padding:0 0 0 var(--sp-2);border:0;background:none;outline:none;color:var(--ink);font:inherit;font-weight:700;font-variant-numeric:tabular-nums;text-align:center}
+.szbox .szchev{display:inline-flex;align-items:center;justify-content:center;width:24px;height:100%;padding:0;border:0;border-radius:0 var(--r-xs) var(--r-xs) 0;background:none;color:var(--mute);cursor:pointer}
+.szbox .szchev:hover{color:var(--ink)}
+#blockSel{width:140px}
+.pal[hidden]{display:none}
+.menu:not([hidden]),.ddm:not([hidden]),.pal:not([hidden]){animation:modalIn var(--t) ease both}   /* падащите менюта и изборът на цвят се появяват като изскачащите прозорци */
+.pal .sw{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--sp-2)}
+.pal .sw button{aspect-ratio:1;border-radius:var(--r-sm);border:1px solid rgba(128,128,160,.5)}
+.pal .sw button:hover{filter:brightness(1.18)}
+.pal .sw button.cur,.pal .sw button.cur:hover{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}   /* цветът на маркирания текст */
+.split .ib:first-child{border-top-right-radius:0;border-bottom-right-radius:0}
+.split .chev{width:22px;border-top-left-radius:0;border-bottom-left-radius:0;border-left:1px solid var(--line)}
+.szbox .szchev i[data-ic],.split .chev i[data-ic]{width:14px;height:14px}
+.pal .cp-sv:focus-visible,.pal .cp-hue:focus-visible{border-color:var(--acc);box-shadow:none}
+.pal .cp-row .hex.bad{border-color:var(--danger-ink)}
+.pal .cp-eye svg{width:17px;height:17px}
+#fontSel{width:180px}
+.fmt .ib[data-act]:disabled{opacity:var(--dis);pointer-events:none}
+@media (max-width:640px){
+  .fmt::-webkit-scrollbar{display:none}
+}
+.pal>*{margin:0!important}

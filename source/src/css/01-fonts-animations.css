@@ -1,0 +1,9 @@
+/* ======================================================================
+   Шрифтове и анимации
+   ====================================================================== */
+@keyframes modalIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes scrimIn{from{opacity:0}to{opacity:1}}
+/* смяна на съдържание (раздел в Настройки, панели, редактор): влиза отстрани с 8 px, отляво или отдясно */
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+/* отместването е по-малко от страничното поле на #setBody, за да не излиза съдържанието извън прозореца */

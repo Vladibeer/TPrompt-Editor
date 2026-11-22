@@ -1,0 +1,750 @@
+/* ======================================================================
+   Уточнения: правила, които трябва да са след основните, защото променят техния вид.
+   Подредени са в реда, в който се прилагат; областта е отбелязана над всяка група.
+   ====================================================================== */
+/* --- Основа: променливи, теми, общи елементи --- */
+.grp{display:flex;gap:var(--sp-2)}
+.btn{height:var(--ctl);padding:0 var(--sp-3);border:1px solid var(--line);background:var(--panel2);display:inline-flex;align-items:center;gap:var(--sp-2);font-weight:700;font-size:var(--fs)}
+/* --- Горна лента и падащи менюта --- */
+.topL{display:contents}   /* обвивка на лого + бутоните за панели; на тесен екран не влияе на подредбата */
+.menu{position:absolute;top:42px;left:0;z-index:30;min-width:230px}
+/* --- Лента за форматиране, избор на цвят и размер --- */
+.fmt{display:flex;align-items:center;gap:var(--sp-1);padding:var(--sp-2) var(--sp-4);background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+/* --- Основа: променливи, теми, общи елементи --- */
+.ib{position:relative;width:var(--ctl);height:var(--ctl);border:1px solid transparent;background:none;display:inline-flex;align-items:center;justify-content:center}
+/* --- Лента за форматиране, избор на цвят и размер --- */
+.sep{width:1px;height:22px;background:var(--line);margin:0 var(--sp-2)}
+/* собствено падащо меню вместо вграденото на системата */
+.ddm{position:fixed;z-index:200;min-width:160px;max-height:320px;overflow:auto;color:var(--ink);font-size:var(--fs);scrollbar-width:thin;scrollbar-color:var(--line) transparent;outline:none}
+.ddm .it:hover,.ddm .it.act{background:var(--hover)}
+.szbox{display:inline-flex;align-items:center;flex:none;height:var(--ctl);border:1px solid var(--line);background:var(--panel2)}
+.pal{position:fixed;z-index:95;width:236px;max-height:calc(100vh - 16px);overflow:auto;padding:var(--sp-3)}
+.split{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--panel2)}
+/* --- Настройки и връзка --- */
+.cbtn{display:inline-flex;align-items:center;justify-content:center;padding:0;flex:none}
+/* --- Лента за форматиране, избор на цвят и размер --- */
+.pal .cp-sv{position:relative;height:148px;border-radius:var(--r);touch-action:none;cursor:crosshair;border:1px solid rgba(128,128,160,.5);background-color:#f00;background-image:linear-gradient(to top,#000,rgba(0,0,0,0)),linear-gradient(to right,#fff,rgba(255,255,255,0))}
+.pal .cp-knob,.pal .cp-ht{position:absolute;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.45);pointer-events:none}
+.pal .cp-knob{width:16px;height:16px;margin:-8px 0 0 -8px}
+.pal .cp-hue{position:relative;height:14px;margin-top:var(--sp-3);border-radius:999px;touch-action:none;cursor:pointer;border:1px solid rgba(128,128,160,.5);background:linear-gradient(to right,#f00 0,#ff0 16.667%,#0f0 33.333%,#0ff 50%,#00f 66.667%,#f0f 83.333%,#f00 100%)}
+.pal .cp-ht{top:50%;width:18px;height:18px;margin:-9px 0 0 -9px}
+.pal .cp-row{display:flex;align-items:center;gap:var(--sp-2);margin-top:var(--sp-3)}
+.pal .cp-prev{flex:1;min-width:44px;height:var(--ctl);border-radius:var(--r);border:1px solid var(--line)}
+.pal .cp-row .hex{flex:none;width:92px;min-width:0;height:var(--ctl);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--panel2);color:var(--ink);padding:0 var(--sp-2);font:inherit;font-size:var(--fs);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.pal .cp-eye{width:var(--ctl);height:var(--ctl);flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r-xs);padding:0}
+.pal .cp-eye:hover{background:var(--hover)}
+.pal .sw{margin-top:var(--sp-3)}
+.pal .cp-acts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--sp-2);margin-top:var(--sp-3)}   /* Отказ и OK: група от 2, по 1/2 */
+.pal .cp-acts .btn{width:100%;justify-content:center}
+.pal .none{margin-top:var(--sp-2);width:100%;height:var(--ctl-sm);border-radius:var(--r-xs);font-weight:600;font-size:var(--fs-sm)}
+/* --- Работна област: редактор, превю и управление --- */
+.work{flex:1;min-height:0;display:flex}
+.stagewrap{flex:1;min-width:0;display:flex;flex-direction:column;padding:var(--sp-4)}
+.foot{display:flex;gap:var(--sp-4);color:var(--mute);font-size:var(--fs-sm)}
+/* --- Настройки и връзка --- */
+/* заглавията „Отметки“, „Библиотека“ и „Настройки“ са еднакви по размер и отстояния и остават на място при скролване */
+/* --- Странични панели: текстове и отметки --- */
+.bmside-h{position:sticky;top:0;z-index:3;min-height:var(--hdr);background:var(--panel);padding:0 0 var(--sp-2) var(--sp-2)}
+/* --- Настройки и връзка --- */
+.row{display:flex;align-items:center;gap:var(--sp-3)}
+.h3row:only-child{margin:0}
+.h3row{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin:0 0 var(--sp-3)}
+.h3row .sw2{flex:none}
+
+.step{display:flex;align-items:center;gap:var(--sp-1)}
+.step .ib{border-color:var(--line);background:var(--panel2);width:var(--ctl);height:var(--ctl)}
+.sw2{position:relative;display:flex;align-items:center;gap:var(--sp-3);cursor:pointer;font-weight:600}
+.sw2 .tr{width:40px;height:22px;border-radius:999px;background:var(--line);position:relative;transition:background var(--t);flex:none}
+.sw2:hover .tr,.sw2 input:focus-visible:not(:checked) + .tr{background:color-mix(in srgb,var(--mute) 40%,var(--line))}
+.sub{color:var(--mute);font-size:var(--fs-sm);margin:var(--sp-2) 0 0}
+.sw2.off{opacity:var(--dis);cursor:not-allowed}
+.presets{display:flex;gap:var(--sp-2);flex-wrap:wrap;margin-top:var(--sp-2)}
+.toggles{display:flex;gap:var(--sp-2)}
+.toggles .btn{flex:1;justify-content:center}
+/* --- Четене (телепромптър) и втори прозорец --- */
+.mkgroup{transition:opacity var(--t)}
+.mkgroup.off{opacity:var(--dis)}
+/* --- Настройки и връзка --- */
+.row > .step{margin-left:auto}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-2) var(--sp-3);margin:0;font-size:var(--fs);align-items:center}
+/* --- Четене (телепромптър) и втори прозорец --- */
+.dim,#band,#pvBand{position:absolute;left:0;right:0;pointer-events:none;display:none}
+.mk .dim,.mk #band,.mk #pvBand{display:block}
+:is(#hud,#rBar2){position:absolute;width:max-content;left:50%;bottom:calc(52px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:4;display:flex;flex-wrap:nowrap;align-items:center;gap:var(--sp-0);max-width:calc(100% - 16px);overflow-x:auto;padding:var(--sp-1) var(--sp-2) var(--sp-5);border-radius:var(--r);background:var(--panel);border:1px solid var(--line);color:var(--ink);box-shadow:var(--sh-float);transition:opacity var(--t-slow),transform var(--t-slow);scrollbar-width:none;cursor:default}
+/* --- Работна област: редактор, превю и управление --- */
+.hprog{position:absolute;left:10px;right:10px;bottom:0;height:22px;cursor:pointer;touch-action:none}
+.hprog i{position:absolute;left:0;right:0;bottom:9px;height:4px;border-radius:var(--r-xs);background:linear-gradient(90deg,#14eac1,#6f5dff);transform-origin:left;transform:scaleX(0)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+:is(#hud,#rBar2) .grpx{display:flex;align-items:center;flex:none;gap:var(--sp-0);padding:0 var(--sp-1);border-left:1px solid var(--line)}
+#hudToggle{position:absolute;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:5;width:36px;height:26px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;opacity:.5;transition:opacity var(--t-slow)}
+/* --- Работна област: редактор, превю и управление --- */
+/* ---- Контролен панел при четене (Android и Windows) +20%, ред 1 = скорост и размер, ред 2 = в началото, старт, маркер, отметки, настройки ---- */
+body:not(.rc) #rBar2 #r2Full,.brk{display:none}
+body #rBar2 .grpx.r2 .ib{order:3;flex:1 1 0;width:auto;min-width:0;height:var(--ctl)}
+body #rBar2 #r2Play{flex:3 1 0}
+body #rBar2 #r2Rot{order:3;padding:0}
+body #rBar2 #r2Close{order:5;flex:1 1 0;width:auto;min-width:0;height:var(--ctl)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+body :is(#hud,#rBar2) :is(#hHome,#r2Home){order:4;flex:1 1 0;width:auto;min-width:0}
+body :is(#hud,#rBar2) :is(#hPlay,#r2Play,#hHome,#r2Home),body :is(#hud,#rBar2) .grpx.r2 .ib{height:var(--ctl)}
+body #hud #hPlay{order:2;flex:3 1 0;width:auto;min-width:0;margin:0 var(--sp-0)}
+body #hud .grpx.r2 .ib,body #hud #hHome,body #hud .grpx.rx .ib{position:static;order:3;flex:1 1 0;width:auto;min-width:0;height:var(--ctl);padding:0;margin:0 var(--sp-0);display:inline-flex;align-items:center;justify-content:center;align-self:center}
+body #hud #hHome{order:4}
+body #hud #xFs{display:none;order:5}
+body #hud #xRot{order:6}
+body #hud #xExit{order:7}
+/* --- Странични панели: текстове и отметки --- */
+#bmSide{display:flex;flex-direction:column;width:var(--bmw,250px);flex:none;overflow:hidden;background:var(--panel);border-right:1px solid var(--line);padding:var(--sp-2) var(--sp-3) 0}
+#bmRSide{display:flex;flex-direction:column;width:var(--bmrw,250px);flex:none;overflow:hidden;background:var(--panel);border-left:1px solid var(--line);padding:var(--sp-2) var(--sp-3) 0}
+.bmsec{flex:1 1 0;min-height:0;overflow:auto;padding-bottom:var(--sp-3)}
+.scsec{flex:1 1 0;min-height:0;overflow:auto;margin:0;padding:0 0 var(--sp-3);border-top:0}
+/* панел на дистанционното: старт/пауза 50% > цял екран > отначало > Х (червен) */
+/* --- Работна област: редактор, превю и управление --- */
+body #rBar2 .grpx.r2,#edCard{display:contents}
+/* --- Странични панели: текстове и отметки --- */
+#bmPanel[data-tab=sc] #bmListRead,#bmPanel[data-tab=bm] #scReadSec,#bmPanel[data-tab=sc] .ptitle[data-p=bm],#bmPanel[data-tab=bm] .ptitle[data-p=sc],.bmtabs{display:none}
+/* дръжките за оразмеряване: само тънка линия, която се появява при посочване; зоната за хващане остава 7px */
+#bmGrip,#bmGripR{flex:none;width:7px;margin:0 -3px;z-index:3;cursor:ew-resize;touch-action:none;background:linear-gradient(color-mix(in srgb,var(--acc) 60%,transparent),color-mix(in srgb,var(--acc) 60%,transparent)) center/0 100% no-repeat;transition:background-size var(--t) ease}
+#bmGrip:hover,#bmGripR:hover{background-size:1px 100%}
+#bmGrip.drag,#bmGripR.drag{background-size:2px 100%}
+:is(#bmSide,#bmRSide) h3{display:flex;align-items:center;gap:var(--sp-2);margin:0 0 var(--sp-3) var(--sp-1);font-size:var(--fs);font-weight:800}
+:is(#bmSide,#bmRSide) h3 i{color:var(--acc)}
+.bmlist{display:flex;flex-direction:column;gap:var(--sp-0)}
+.bmi{scroll-margin:58px 0 8px;display:flex;align-items:center;gap:var(--sp-2);border-radius:var(--r-sm);padding:var(--sp-0) var(--sp-1) var(--sp-0) var(--sp-2);cursor:pointer}
+/* редовете в списъците с текстове и отметки не светват нито при посочване, нито при натискане; светват само бутоните в тях */
+.bmi .n{flex:none;height:var(--ctl-sm);border-radius:var(--r-sm);color:var(--mute);font-weight:700;font-variant-numeric:tabular-nums;display:inline-flex;align-items:center}
+.bmi .tt{flex:1;min-width:0;text-align:left;background:none;border:0;padding:var(--sp-2) 0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bmi.cur{background:color-mix(in srgb,var(--teal) 20%,transparent)}
+.bmempty{color:var(--mute);font-size:var(--fs)}
+.ptitle{display:inline-flex;align-items:center;gap:var(--sp-2)}
+/* „Завърти“ е само докато текстът на компютъра се показва на Android устройство */
+/* завъртането е само в Android приложението */
+/* --- Четене (телепромптър) и втори прозорец --- */
+body:not(.devView) #rBar2 #r2Rot,body:not(.isdroid) #hud #xRot,#ctlLock #rBar2 .grpx.r2,#ctlLock #r2Close,.vnosc #hSc{display:none}
+/* --- Странични панели: текстове и отметки --- */
+/* едно и също изглеждане на отметките и текстовете навсякъде; иконата вдясно е за редакция */
+.bmi .ib{flex:none;width:var(--ctl-sm);height:var(--ctl-sm);border-radius:var(--r-sm);color:var(--mute)}
+.bmi .ib:hover{background-color:color-mix(in srgb,var(--ink) 14%,transparent);color:var(--ink)}
+.bmi .ib.on,.bmi .ib.on:hover{color:var(--onacc)}
+/* --- Основа: променливи, теми, общи елементи --- */
+/* --- Прозорци, диалози и известия --- */
+.modal-card.ex-card{width:fit-content;min-width:min(260px,100%);max-width:min(460px,100%);height:auto}   /* „Пусни“ и „Експортирай“: ширината е по най-дългия ред */
+.st-rem{display:flex;align-items:center;gap:var(--sp-3);font-size:var(--fs-md);font-weight:600;cursor:pointer}
+.st-note{line-height:1.4;color:var(--ink);font-size:var(--fs);margin:0 var(--sp-0) var(--sp-3)}
+.ex-ext{flex:none;width:46px;height:var(--ctl-sm);display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r-sm);background:color-mix(in srgb,var(--acc) 24%,var(--panel2));color:var(--ink);font-size:var(--fs-xs);font-weight:800;letter-spacing:.04em}
+/* втори прозорец; в Android приложението вече е на цял екран */
+/* --- Четене (телепромптър) и втори прозорец --- */
+body.viewer:not(.android) #hud #xFs,#vBar #vClose,#vBar #vFs,.sv .ic,.sv i{display:inline-flex}
+.foot .sv{display:inline-flex;align-items:center;gap:var(--sp-2)}
+/* --- Странични панели: текстове и отметки --- */
+#bmPanel .bmhead{gap:var(--sp-2);display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:var(--fs-lg)}
+#bmPanel .ib{color:var(--ink)}
+#bmPanel .ib:hover{background:var(--hover)}
+#bmPanel .bmempty{color:var(--mute)}
+#scListRead>.bmi.sel,#bmListRead>.bmi.sel{outline:2px solid var(--amber);outline-offset:-2px;background:var(--hover)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+/* етикетът за режима е в тон с приложението: само основния цвят --acc, без различен цвят за всеки режим;
+   фиксирана широчина, за да не скача при смяна на режима (най-дълго е „Текстове 12/12“ / „Bookmarks 12/12“) */
+#clBadge{position:absolute;left:50%;bottom:120px;z-index:7;display:flex;align-items:center;justify-content:flex-start;gap:var(--sp-2);width:232px;max-width:calc(100vw - 28px);box-sizing:border-box;padding:var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-3);border-radius:var(--r);font:600 var(--fs-lg)/1.2 Manrope,system-ui,sans-serif;background:var(--panel);color:var(--ink);border:1px solid var(--line);box-shadow:var(--sh-float);opacity:0;transform:translateX(-50%) translateY(4px);transition:opacity var(--t-slow),transform var(--t-slow);pointer-events:none}
+#clBadge .l{color:var(--mute);font-weight:600;white-space:nowrap}
+#clBadge .dots{display:flex;flex:none;gap:var(--sp-1);margin-left:auto;padding-left:var(--sp-2)}
+/* --- Настройки и връзка --- */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;background:var(--panel2)}
+/* --- Основа: променливи, теми, общи елементи --- */
+/* --- Странични панели: текстове и отметки --- */
+.bmside-h{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;row-gap:0}   /* при свързано устройство иконките са четири и може да слязат на втори ред */
+:is(#bmSide,#bmRSide) .close{display:none}
+#scrim{display:none;position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.5)}
+body.drawer #scrim{display:block}
+/* --- Основа: променливи, теми, общи елементи --- */
+.btn[hidden],.touch-only{display:none}
+body.tauri .touch-only{display:none!important}
+@media (hover:none) and (pointer:coarse){
+  .touch-only{display:block}
+}
+/* --- Работна област: редактор, превю и управление --- */
+#remote[hidden]{display:none}
+#remote{position:relative;flex:none;display:flex;flex-direction:column;border-radius:var(--r);color:var(--float-ink);background:none;border:0;padding:0;box-shadow:none;gap:var(--sp-3)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+.rbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--sp-2)}
+/* --- Работна област: редактор, превю и управление --- */
+#remote .rg{display:flex;align-items:center;gap:var(--sp-0);padding-left:var(--sp-2);border-left:1px solid rgba(255,255,255,.14)}
+#remote .rg > i{width:14px;height:14px;color:#98a0d4;margin-right:var(--sp-0)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+.rprog{position:relative;height:14px;cursor:pointer}
+.rprog i{position:absolute;left:0;right:0;top:5px;height:4px;border-radius:var(--r-xs);background:linear-gradient(90deg,#14eac1,#6f5dff);transform-origin:left;transform:scaleX(0)}
+/* --- Настройки и връзка --- */
+.phoneUrl{word-break:break-all;font-size:var(--fs-sm);color:var(--mute);margin:var(--sp-1) 0 var(--sp-2);user-select:all;text-align:center}
+/* --- Прозорци, диалози и известия --- */
+.rm-qrwrap{display:flex;justify-content:center;margin:var(--sp-3) 0 var(--sp-1)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+/* --- Настройки и връзка --- */
+/* Роли за свързване: Монитор / Дистанционно */
+.step input,.net-role-bar{text-align:center}
+.net-role-lbl{display:block;color:var(--acc);text-align:center}
+.net-role-seg{display:flex;width:100%;max-width:340px;margin:0 auto;justify-content:center;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:var(--sp-1);gap:var(--sp-1);box-sizing:border-box}
+.net-role-seg .btn{flex:1;height:var(--ctl);border:none;border-radius:var(--r-sm);background:transparent;color:inherit;font-size:var(--fs);font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);cursor:pointer}
+.net-role-seg .btn[aria-selected="true"],.net-role-seg .btn.on{background:var(--panel);color:var(--acc);box-shadow:var(--sh1)}
+/* Адресна лента с бутон Копирай непосредствено до адреса */
+
+.net-addr-box .phoneUrl{flex:1;min-width:0;margin:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs);font-family:monospace;padding:var(--sp-2) var(--sp-3);border-radius:var(--r);border:1px solid var(--line);user-select:all}
+
+
+/* Компактни бутони за действия */
+.net-acts-row{display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap}
+.net-acts-row .btn{flex:none;height:var(--ctl);padding:0 var(--sp-3);display:inline-flex;align-items:center;gap:var(--sp-2);font-size:var(--fs);border-radius:var(--r-sm);white-space:nowrap}
+/* Заместители (плейсхолдъри) за камерата и QR кода: виждат се, докато реалният елемент е скрит */
+.net-cli-ph{flex-direction:column;gap:var(--sp-2);box-sizing:border-box;border:1.5px dashed var(--line);border-radius:var(--r);color:var(--mute);font-size:var(--fs-sm);font-weight:600}
+#netCliCam:not([hidden])+.net-cli-ph-cam{display:none}
+/* Мрежа: без запълнени фонове; бутоните за роля (Монитор / Дистанционно) са водещият елемент на раздела */
+/* Монитор / Дистанционно: същият стил като горната лента – без фон и рамка, иконата над текста, активният се познава по цвета на иконата */
+/* „Монитор“ и „Дистанционно“: същите като бутоните в горната лента — ширина, височина, шрифт, икона и разстояния според ширината на екрана */
+#settings .net-role-seg{display:flex;justify-content:center;max-width:none;width:100%;margin:0;padding:0;gap:var(--sp-2);background:none;border:0;border-radius:0;box-shadow:none}
+#settings .net-role-seg .btn{flex:none;width:150px;height:40px;flex-direction:row;justify-content:center;gap:var(--sp-2);padding:0 var(--sp-3);border:0;border-radius:var(--r-sm);font-size:var(--fs-lg);font-weight:700;white-space:nowrap}
+#settings .net-role-seg .btn [data-ic]{width:20px;height:20px}
+#settings .net-role-seg .btn span{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+@media (min-width:641px) and (max-width:960px){
+  #settings .net-role-seg .btn{width:114px;gap:var(--sp-1);padding:0 var(--sp-2);font-size:var(--fs)}
+}
+@media (max-width:640px){
+  #settings .net-role-seg{gap:var(--sp-1)}
+  #settings .net-role-seg .btn{width:calc((100vw - 2 * var(--sp-3) - 4 * var(--sp-1)) / 5);height:48px;flex-direction:column;gap:var(--sp-0);padding:0 var(--sp-0);font-size:var(--fs-xs)}
+}
+.net-role-bar{border-bottom:0}
+#netHostSec .h3row,#netCliSec .h3row{margin:0 0 var(--sp-2)}
+#netHostSec .rm-qrwrap{margin:var(--sp-1) 0}
+#netHostSec .net-host-card .phoneUrl{color:inherit;font-family:inherit;font-size:var(--fs);height:var(--ctl);box-sizing:border-box;display:flex;align-items:center;padding:0 var(--sp-3);border:1px solid var(--line)}
+.net-addr-box,.net-acts-row{margin:var(--sp-2) 0}
+.net-cli-ph{display:grid;grid-template-columns:auto 1fr;align-items:center;justify-content:start;column-gap:var(--sp-3);row-gap:var(--sp-2);min-height:0;padding:var(--sp-3);text-align:left}
+.net-cli-ph [data-ic]{color:var(--acc);opacity:.85;width:26px;height:26px}
+.net-cli-ph .net-cli-scan{grid-column:1 / -1;margin:0;width:100%}
+#setBody[data-tab="conn"]>section{flex:none}
+
+
+
+
+.net-cli-ph.net-cli-ph-cam{display:flex;align-items:center;justify-content:center;width:var(--net-sq);height:var(--net-sq);aspect-ratio:1/1;margin:0 auto;padding:var(--sp-3)}
+.net-cli-ph.net-cli-ph-cam .net-cli-scan{width:100%;padding:0 var(--sp-2)}
+.net-cli-cam{width:var(--net-sq);height:var(--net-sq);aspect-ratio:1/1;margin:0 auto}
+#netHostQr{display:block;border-radius:var(--r);image-rendering:pixelated;background:#fff;box-shadow:0 0 0 1px var(--line);margin:0 auto;width:var(--net-sq);height:var(--net-sq)}
+#netHostSec .btn,#netCliSec .btn,#netHostSec .btn.primary,#netCliSec .btn.primary{background:transparent;font-weight:600}
+.seg button:not([aria-pressed="true"]):hover,#netHostSec .btn:hover,#netCliSec .btn:hover{background:var(--hover)}
+.net-cli-ph{background:none}
+/* на сензорен екран фонът не остава след докосване */
+/* след щракване фонът изчезва, докато мишката не излезе от бутона */
+#settings .step .ib.noh:hover,.net-cli-input,.net-addr-box .phoneUrl{background:transparent}
+/* Тема: цветовете и бутонът „Нулирай“ на един ред */
+
+
+
+/* адресът с бутоните – най-отдолу в панела, надписът под реда */
+/* Дистанционно: подредена колона — скенер, QR код, адрес, действия */
+#setBody[data-tab="conn"],.net-cli-stack{display:flex;flex-direction:column}
+.net-cli-stack .btn{height:var(--ctl);justify-content:center;font-size:var(--fs)}
+.net-cli-stack .btn.primary{background:transparent;border:1px solid var(--acc);color:var(--acc);filter:none;box-shadow:none}
+.net-cli-stack .btn.primary:hover{background:var(--hover);filter:none;box-shadow:none}
+.net-cli-cam{position:relative;background:#000;border-radius:var(--r);overflow:hidden}
+.net-cli-cam .ib{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff}
+   /* без фон и рамка под полето с адреса и бутоните */
+.net-cli-lbl{text-align:left;font-size:var(--fs-sm);font-weight:700;color:var(--mute)}
+.net-cli-input{width:100%;height:var(--ctl);padding:0 var(--sp-3);border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel);color:inherit;font-family:inherit;font-size:var(--fs);box-sizing:border-box}
+/* --- Прозорци, диалози и известия --- */
+#remBar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:var(--sp-3);max-width:min(560px,calc(100vw - 20px));padding:var(--sp-2) var(--sp-2) var(--sp-2) var(--sp-3);border:1px solid var(--line);background:color-mix(in srgb,var(--acc) 22%,var(--panel2));box-shadow:var(--sh2);font-size:var(--fs);font-weight:700}
+/* „Пусни“: една обща опция „Цял екран на свързаното устройство“ за двете роли (Монитор и Дистанционно) */
+/* точката свети само докато текстът се показва на свързаното устройство */
+/* в този прозорец недостъпната опция не се показва (без връзка) */
+.modal-body.opts>[hidden],#startModal #rmShow::after,#startModal #rmShow:disabled,#remBar[hidden],body.reading #remBar{display:none}
+#remBar>span:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#remBar .rb-s{flex:none;font-weight:600;color:var(--mute)}
+#remBar.ok .rb-s{color:var(--teal)}
+#remBar.err .rb-s{color:var(--danger-ink)}
+#remBar .btn{height:var(--ctl-sm);flex:none}
+.rm-row{display:flex;gap:var(--sp-2);flex-wrap:wrap;margin:var(--sp-2) 0}
+.rm-row .btn{flex:1 1 auto;justify-content:center}
+.rm-row input:focus{background:var(--hover)}
+/* Прозорец „Начин на стартиране“: един и същ размер, който не се мени със състоянието на връзката
+   (преди височината скачаше между QR код, действия и избор), показват се и се скриват като „Настройки“ */
+#startModal{padding:calc(var(--sp-4) + env(safe-area-inset-top,0px)) calc(var(--sp-4) + env(safe-area-inset-right,0px)) calc(var(--sp-4) + env(safe-area-inset-bottom,0px)) calc(var(--sp-4) + env(safe-area-inset-left,0px))}
+body.reading #startModal{background:rgba(0,0,0,.3)}
+@media (max-width:640px){
+  #startModal{padding:calc(var(--sp-2) + env(safe-area-inset-top,0px)) calc(var(--sp-2) + env(safe-area-inset-right,0px)) calc(var(--sp-2) + env(safe-area-inset-bottom,0px)) calc(var(--sp-2) + env(safe-area-inset-left,0px))}
+}
+@media (hover:none) and (pointer:coarse){
+  /* --- Четене (телепромптър) и втори прозорец --- */
+  .rprog{height:26px}
+  .rprog::before,.rprog i{top:11px}
+}
+#embBox,#rvBox{position:fixed;inset:0;z-index:300;background:#000}
+@media (max-width:900px){
+  /* --- Работна област: редактор, превю и управление --- */
+  body:is(.rc,.nt) .work{position:relative;overflow:clip;flex-direction:column;background:var(--panel)}
+}
+@media (max-width:900px){
+  /* --- Четене (телепромптър) и втори прозорец --- */
+  /* при четене на цял екран панелите са отделни слоеве, затова правилата важат само извън него */
+  body:is(.rc,.nt):not(.reading) :is(#bmSide,#bmRSide){position:static;z-index:auto;transform:none;max-width:none;display:none;order:1;transition:none}
+}
+@media (max-width:900px){
+  /* --- Странични панели: текстове и отметки --- */
+  body:is(.rc,.nt) #scrim,body:is(.rc,.nt) :is(#bmGrip,#bmGripR,#pvGrip){display:none!important}
+}
+@media (max-width:900px){
+  /* --- Работна област: редактор, превю и управление --- */
+  body:is(.rc,.nt) .foot,body:is(.rc,.nt) #edCard{display:none}
+  body:is(.rc,.nt)[data-rcv=ed] #edCard{display:flex;flex-direction:column;order:1}
+}
+@media (max-width:900px){
+  /* --- Четене (телепромптър) и втори прозорец --- */
+  body:is(.rc,.nt):not(.reading) :is(#edCard,#bmSide,#bmRSide){flex:1 1 0;min-height:0;width:auto;margin:0;padding:var(--sp-3) var(--sp-3);border:0;border-radius:0;background:var(--panel);color:var(--ink);box-shadow:none;overflow:auto}
+  body:is(.rc,.nt):not(.reading) #edCard{padding:0;overflow:clip}
+}
+@media (max-width:900px){
+  /* --- Работна област: редактор, превю и управление --- */
+  body:is(.rc,.nt) #edCard .fmt{display:flex;flex:none;border-bottom:1px solid var(--line)}
+}
+@media (max-width:900px){
+  /* --- Четене (телепромптър) и втори прозорец --- */
+  body.rc.rcLive #remote{display:flex!important;flex:0 0 calc(50% - 8px);height:auto;margin-top:auto}   /* панелът с превюто е с постоянен размер, горният панел заема останалото */
+}
+@media (max-width:900px){
+  /* --- Странични панели: текстове и отметки --- */
+  .bmtabs{display:flex;align-items:center;gap:var(--sp-2);margin:0;flex:none}
+  #bmRSide .bmsec,#bmSide .scsec{flex:1 1 auto}
+  #bmSide .scsec{border-top:0;padding-top:0}
+}
+@media (max-width:900px){
+  @media (max-height:520px){
+    /* --- Четене (телепромптър) и втори прозорец --- */
+    body.rc .work{flex-direction:row}
+  }
+}
+@media (max-width:900px){
+  /* --- Прозорци, диалози и известия --- */
+  body.rc #bWin{display:none!important}
+}
+@media (max-width:900px){
+  /* --- Четене (телепромптър) и втори прозорец --- */
+  /* контролите са част от панела на превюто */
+  body.rc #remote{display:none!important;order:3;min-height:0;background:var(--panel);color:var(--ink);gap:var(--sp-2)}
+  body.rc #remote .rprog{flex:none;height:30px;margin:0 var(--sp-0)}
+  body.rc #remote .rbar{flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:var(--sp-2)}
+  body.rc #remote .rbar .ib{width:var(--ctl-xl);height:var(--ctl-xl);border-radius:var(--r);border:1px solid var(--line);background:var(--panel2);color:var(--ink);flex:none;touch-action:manipulation}
+  body.rc #remote .rbar .play{order:1;flex:1 1 calc(100% - 132px);width:auto;min-width:0;height:var(--ctl-xl);color:#06231d;gap:var(--sp-3)}
+  body.rc #remote .rbar .rg{order:5;flex:1 1 calc(50% - 4px);min-width:0;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-0);padding:var(--sp-1);border:1px solid var(--line);border-radius:var(--r);background:var(--panel2)}
+}
+/* --- Настройки и връзка --- */
+.modal-body .keys{margin-top:var(--sp-2)}
+/* --- Работна област: редактор, превю и управление --- */
+/* --- Горна лента и падащи менюта --- */
+.viewtog{gap:var(--sp-2)}
+.viewtog .btn[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.viewtog .btn:disabled{cursor:default}
+@media (min-width:641px){
+  .top .btn{width:132px;padding:0 var(--sp-3);justify-content:center;white-space:nowrap}
+}
+@media (min-width:641px) and (max-width:900px){
+  .top .btn{width:112px}
+}
+@media (min-width:901px){
+  /* --- Странични панели: текстове и отметки --- */
+  body.hide-sc #bmSide,body.hide-sc #bmGrip,body.hide-bm #bmRSide,body.hide-bm #bmGripR,body.ed-off #editor,body.ed-off #pvGrip{display:none}
+}
+/* --- Четене (телепромптър) и втори прозорец --- */
+body.ctl-off #remote .rprog,body.ctl-off #remote .rbar{display:none}
+/* --- Работна област: редактор, превю и управление --- */
+#pvGrip{position:relative;flex:none;height:7px;margin:-4px 0;z-index:3;cursor:ns-resize;touch-action:none;background:transparent;transition:background var(--t)}
+#pvGrip:hover,#pvGrip.drag{background:var(--acc)}
+.stagewrap.pvfull #pvGrip,body:not(.rc) #remote .rg,#pvGrip[hidden]{display:none}
+#pvToast{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:5;max-width:90%;padding:var(--sp-2) var(--sp-3);border-radius:var(--r);background:var(--float-bg);color:#fff;border:1px solid var(--float-line);font-weight:700;font-size:var(--fs);opacity:0;pointer-events:none;transition:opacity var(--t-slow);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pvWrap{position:relative;flex:none;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#pv{position:relative;flex:none;overflow:hidden;background:var(--pbg);border-radius:var(--r-xs);contain:layout paint style}
+#pvStage{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden}
+#pvScroller{position:relative;will-change:transform}
+#pvText{width:var(--pw);margin:0 auto;font-family:var(--pfont);font-size:var(--pfs);line-height:var(--plh);color:var(--pcolor);word-wrap:break-word}
+/* --- Четене (телепромптър) и втори прозорец --- */
+body.viewer .top,body.viewer .fmt,body.viewer #bmSide,body.viewer #bmRSide,body.viewer .stagewrap,body.viewer #remote{display:none!important}
+/* --- Настройки и връзка --- */
+#settings .net-role-panel[hidden],#netHostDesc[hidden],#netHostNoSupport[hidden],#netHostSec #netHostOff[hidden],.net-cli-stack [hidden],body.viewer:not(.reading) #settings,html.vpre body:not(.viewer) :is(#settings,.top,.fmt,#bmSide,#bmRSide,.stagewrap,#remote){display:none!important}   /* без текст (и преди да е готов) прозорецът за четене няма панел с настройки */
+@media (max-width:900px){
+  /* --- Четене (телепромптър) и втори прозорец --- */
+  /* --- Странични панели: текстове и отметки --- */
+  #scrim{top:var(--tbh,63px)}   /* панелите започват под лентата, за да остане тя достъпна */
+  #bmSide,#bmRSide{position:fixed;top:var(--tbh,63px);bottom:0;z-index:60;width:min(340px,90vw);padding-top:var(--sp-2);transition:transform var(--t-slow);box-shadow:var(--sh2)}
+  #bmSide{left:0;transform:translateX(-105%);border-right:1px solid var(--line)}
+  #bmRSide{right:0;transform:translateX(105%);border-left:1px solid var(--line)}
+  #bmSide .close,#bmRSide .close{display:inline-flex}
+  #bmGrip,#bmGripR{display:none}
+}
+@media (max-width:900px){
+  /* --- Лента за форматиране, избор на цвят и размер --- */
+  #fontSel{width:130px}
+}
+@media (max-width:640px){
+  /* --- Горна лента и падащи менюта --- */
+  .top > *{flex:none}
+  .brand{margin-right:0;display:none}
+  .top{flex-wrap:nowrap;padding:var(--sp-2) var(--sp-3);scrollbar-width:none;-webkit-overflow-scrolling:touch;gap:var(--sp-1)}
+  .top .grp{gap:var(--sp-1)}
+}
+@media (max-width:640px){
+  /* --- Основа: променливи, теми, общи елементи --- */
+  .grp{gap:var(--sp-2)}
+  .btn{height:var(--ctl);padding:0 var(--sp-3)}
+  .btn kbd,.btn .t{display:none}
+}
+@media (max-width:640px){
+  /* --- Горна лента и падащи менюта --- */
+  /* устройство: всички бутони в лентата са с еднаква ширина, иконата е над надписа */
+  .top > .grow{flex:1 0 0;min-width:0;display:none}
+  /* пет еднакви колони: Библиотека, Отметки, Редактор, Пусни, Настройки */
+  .top{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));overflow:visible}
+  .top .grp,.top .menuwrap{display:contents}
+  .top .btn{width:100%;height:var(--ctl);flex-direction:column;justify-content:center;gap:var(--sp-0);padding:0 var(--sp-0);font-size:var(--fs-xs);letter-spacing:0}
+  .top .btn .t{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .top .btn i[data-ic]{width:18px;height:18px}
+  .menu{position:fixed;left:10px;top:70px}
+}
+@media (max-width:640px){
+  /* --- Прозорци, диалози и известия --- */
+  #bWin{display:none}
+}
+@media (max-width:640px){
+  /* --- Лента за форматиране, избор на цвят и размер --- */
+  .fmt{flex-wrap:nowrap;overflow-x:auto;padding:var(--sp-2) var(--sp-3);scrollbar-width:none}
+  /* същата подредба като на компютър: редът следва HTML-а, лентата само се превърта настрани */
+  .fmt > *{flex:none}
+  #blockSel{width:124px}
+}
+@media (max-width:640px){
+  /* --- Основа: променливи, теми, общи елементи --- */
+  .ib{width:var(--ctl);height:var(--ctl)}
+}
+@media (max-width:640px){
+  /* --- Лента за форматиране, избор на цвят и размер --- */
+  .split .chev{width:26px}
+  .split .chev i[data-ic]{width:16px;height:16px}
+  #fontSel{width:118px}
+}
+@media (max-width:640px){
+  /* --- Работна област: редактор, превю и управление --- */
+  .stagewrap{padding:var(--sp-2)}
+  #editor{padding:var(--sp-4) var(--sp-3);border-radius:var(--r)}
+  .foot{font-size:var(--fs-xs);flex-wrap:wrap;gap:var(--sp-0) var(--sp-3)}
+}
+@media (max-width:640px){
+  /* --- Четене (телепромптър) и втори прозорец --- */
+  #hud{flex-wrap:wrap;justify-content:center;overflow:visible;padding:var(--sp-2) var(--sp-2) var(--sp-5);gap:var(--sp-0);bottom:calc(58px + env(safe-area-inset-bottom,0px))}
+  #hud .grpx{border-left:0;padding:0 var(--sp-0)}
+  #hud .grpx>i[data-ic]{width:13px;height:13px}
+  #hud .meta{display:none}
+  #hudToggle{width:48px;height:32px;bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:640px){
+  /* --- Прозорци, диалози и известия --- */
+  #toast{bottom:calc(130px + env(safe-area-inset-bottom,0px))}
+}
+/* --- Основа: променливи, теми, общи елементи --- */
+.ib[hidden]{display:none!important}
+/* --- Четене (телепромптър) и втори прозорец --- */
+#ctlLock{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:var(--sp-4);background:color-mix(in srgb,var(--bg) 96%,transparent)}
+#vBar,#ctlLock[hidden]{display:none}
+.ctlcard{width:min(980px,100%);max-height:100%;gap:var(--sp-3);padding:var(--sp-5)}
+.ctlhead{display:flex;gap:var(--sp-3);align-items:flex-start}
+.ctlfoot{display:flex;justify-content:flex-end}
+#ctlPvWrap{display:flex;justify-content:center;min-height:0}
+#ctlPv{position:relative;flex:none;overflow:hidden;background:var(--pbg,#000);border-radius:var(--r-xs)}
+#ctlStage{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden}
+#ctlScroller{position:relative;will-change:transform}
+#ctlText{width:var(--pw,82%);margin:0 auto;font-family:var(--pfont,sans-serif);font-size:var(--pfs,64px);line-height:var(--plh,1.35);color:var(--pcolor,#fff);word-wrap:break-word}
+#ctlText p,#ctlText h1,#ctlText h2,#ctlText h3,#ctlText h4,#ctlText h5,#ctlText h6,#ctlText ul,#ctlText ol,#ctlText blockquote{margin:0 0 .6em}
+#ctlText h3{font-size:1.2em}
+#ctlMk{position:absolute;left:0;right:0;display:none;pointer-events:none}
+@media (max-width:900px){
+  /* Android (дистанционно): панелът с превюто е на цялата ширина и стига до долния край */
+  body.rc #remote{margin:0;padding:0 0 var(--sp-2);border:0;border-top:1px solid var(--line);border-radius:0}
+  body.rc.rcLive #remote{padding-bottom:calc(var(--sp-2) + env(safe-area-inset-bottom,0px))}
+  @media (max-height:520px){
+    body.rc.rcLive #remote{margin:0;border-top:0;border-left:1px solid var(--line)}
+  }
+}
+/* --- Странични панели: текстове и отметки --- */
+/* показван текст: зелен ред и ▶; редактиран текст: запълнен молив */
+.bmi .live{flex:none;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;color:var(--teal)}
+.bmi .live svg{width:13px;height:13px}
+/* списъци в страничния панел: име | ✎ редактирай | ▶ пусни; запълнен ✎ = редактира се, запълнен ▶ = показва се */
+#scList .bmi,#bmListEdit .bmi{cursor:default;gap:var(--sp-2);padding-right:var(--sp-1)}
+#scList .bmi.cur,#bmListEdit .bmi.cur{background:none}
+.bmi .act{flex:none;border-radius:var(--r-sm);background:color-mix(in srgb,var(--ink) 9%,transparent);color:var(--mute)}
+.bmi .act svg{width:15px;height:15px}
+.bmi .lnk{flex:none;display:inline-flex;align-items:center;color:var(--teal);margin:0 var(--sp-1)}
+.bmi .act:hover{background:color-mix(in srgb,var(--ink) 18%,transparent);color:var(--ink)}
+.bmi:not(.cur)>.live{display:none}
+.scact .btn{min-width:0;height:var(--ctl);padding:0 var(--sp-2);justify-content:center;gap:var(--sp-2)}
+.scact .btn .t{display:inline;padding:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (min-width:901px){
+  .scact .btn{flex-direction:column;height:var(--ctl);gap:var(--sp-0);padding:0 var(--sp-0);font-size:var(--fs-xs)}
+}
+.bmowner{display:flex;align-items:center;gap:var(--sp-2);margin:0 var(--sp-1) var(--sp-2) var(--sp-2);color:var(--mute);font-size:var(--fs-sm);font-weight:700}
+body.hide-bm #bmRSide,body.hide-sc #bmSide,.bmowner[hidden]{display:none}
+.bmi .lnk svg,.bmowner .live{width:14px;height:14px}
+.bmowner.ed .live{color:var(--mute)}   /* нищо не се показва: името е на текста в редактора, с икона на молив */
+.bmowner span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* настройки: заглавието е залепено до горния край (без празно място над него); при скритото заглавие (телефон) остава старият отстъп */
+/* хедърите на „Отметки“ и „Библиотека“ са със същата височина, отстъп и размер на иконите като „Настройки“ (иначе текстът и иконите не са на една линия) */
+#bmPanel{position:absolute;right:0;top:0;bottom:0;z-index:5;width:min(340px,88vw);padding:calc(var(--sp-3) + env(safe-area-inset-top,0px)) var(--sp-3) var(--sp-3);overflow:auto;background:var(--panel);color:var(--ink);border-left:1px solid var(--line);transform:translateX(105%);transition:transform var(--t-slow);cursor:default;padding-top:0}
+#bmPanel .bmhead{padding:calc(var(--sp-2) + env(safe-area-inset-top,0px)) var(--sp-2) var(--sp-2);min-height:calc(var(--hdr) + env(safe-area-inset-top,0px));margin-bottom:var(--sp-2);line-height:1.2}
+#bmPanel .ptitle{gap:var(--sp-2)}
+#bmPanel .ptitle i[data-ic]{width:18px;height:18px}
+/* --- Основа: променливи, теми, общи елементи --- */
+/* ---- единни състояния за всички елементи и режими ----
+   посочване / фокус от клавиатура = по-светъл фон; натискане = по-плътен фон; активно = контур и светлина. */
+:focus-visible{outline:none}
+/* --- Настройки и връзка --- */
+.presets button:hover{filter:brightness(1.18)}
+.btn:not(.primary):not([aria-pressed="true"]):active, .ib:not(.on):not(.play):active, .menu button:active, .seg button:not([aria-pressed="true"]):active, .ddm .it:active, input[type=color]:active{background-color:var(--press)}   /* редовете в списъците с текстове и отметки не светват при натискане */
+/* --- Основа: променливи, теми, общи елементи --- */
+.btn.primary:active,.play:active{filter:brightness(.88)}
+/* --- Настройки и връзка --- */
+.pal .sw button:active,.presets button:active{filter:brightness(.85)}
+.toggles .btn[aria-pressed="true"]{background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--ink)}
+.toggles .btn[aria-pressed="true"]:hover{background:color-mix(in srgb,var(--acc) 22%,transparent);box-shadow:none}
+#settings .net-role-seg .btn[aria-selected="true"] i,#settings .net-role-seg .btn.on i,#netHostSec #netHostOff,#netHostSec h3 i,#netCliSec h3 i,.toggles .btn[aria-pressed="true"] i{color:var(--acc)}
+.seg button[aria-pressed="true"],.ib.on,.bmi .ib.on,.bmi.editing .act.e{background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+.seg button[aria-pressed="true"]{color:var(--ink)}
+.seg button[aria-pressed="true"]:hover,.ib.on:hover,.bmi .ib.on:hover,.bmi.editing .act.e:hover{background:color-mix(in srgb,var(--acc) 22%,transparent);box-shadow:inset 0 0 0 1px var(--acc)}
+/* натискане: кратък лилав фон и за включените бутони, падащите списъци и полето за размер */
+:is(.ib.on,select,.szbox):active,.bmi.editing .act.e:active{background-color:var(--press)}
+/* неналичен бутон: не реагира на посочване и натискане */
+:is(.btn,.ib):disabled{pointer-events:none}
+/* --- Странични панели: текстове и отметки --- */
+.bmi.cur .act.p,.bmi.cur .act.p:hover,#scList .bmi.cur .n,#bmListEdit .bmi.cur .n,#scListRead .bmi.cur .n,#bmListRead .bmi.cur .n{background:color-mix(in srgb,var(--teal) 12%,transparent);color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+.bmi.cur .act.p:hover{background:color-mix(in srgb,var(--teal) 22%,transparent);box-shadow:inset 0 0 0 1px var(--teal)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+:is(#hud,#rBar2) .ib.on,:is(#hud,#rBar2) .ib.on:hover{background:color-mix(in srgb,var(--amber) 14%,transparent);color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+:is(#hud,#rBar2) .ib.on:hover{background:color-mix(in srgb,var(--amber) 24%,transparent);box-shadow:inset 0 0 0 1px var(--amber)}
+/* --- Горна лента и падащи менюта --- */
+.menu button[aria-pressed="true"]{background:color-mix(in srgb,var(--acc) 12%,transparent)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+/* контролен панел (четене, втори прозорец, дистанционно): старт/пауза и затваряне са като останалите бутони - без цветно запълване;
+   акцентът е в иконата, а активното (върви) е с контур и светлина */
+body :is(#hud,#rBar2) .play,body #remote .rbar .play,body.rc #remote .rbar .play,body #rBar2 #r2Close{background:none;border:1px solid transparent;color:var(--ink);box-shadow:none}
+body.rc #remote .rbar .play{border-color:var(--line);background:var(--panel2)}
+body :is(#hud,#rBar2) .play:hover,body #remote .rbar .play:hover,body.rc #remote .rbar .play:hover,body #rBar2 #r2Close:hover{background:var(--hover);filter:none}
+body :is(#hud,#rBar2) .play:active,body #remote .rbar .play:active,body #rBar2 #r2Close:active{background:var(--press);filter:none}
+body :is(#hud,#rBar2) .play[aria-pressed="true"],body #remote .rbar .play[aria-pressed="true"],body.rc #remote .rbar .play[aria-pressed="true"]{background:color-mix(in srgb,var(--teal) 12%,transparent);box-shadow:inset 0 0 0 1px var(--teal)}
+body :is(#hud,#rBar2) .play[aria-pressed="true"]:hover,body #remote .rbar .play[aria-pressed="true"]:hover{background:color-mix(in srgb,var(--teal) 22%,transparent);box-shadow:inset 0 0 0 1px var(--teal)}
+/* --- Странични панели: текстове и отметки --- */
+.scact{grid-template-columns:repeat(3,1fr);display:flex;gap:var(--sp-0);margin:0}
+.scact .ib{width:var(--ctl);height:var(--ctl);flex:none}
+/* четене (цял екран и Android): „Библиотека“ излиза отляво, „Отметки“ – отдясно */
+#bmPanel[data-tab=sc]{right:auto;left:0;border-left:0;border-right:1px solid var(--line);transform:translateX(-105%)}
+/* --- Горна лента и падащи менюта --- */
+/* Горна лента (Библиотека, Редактор, Отметки, Пусни, Настройки): без фон, рамка и сянка – остават само иконата и текстът.
+   Включеният панел и отвореният прозорец се познават по лилава икона, посочването – по лилав текст, натискането – по кратък лилав фон, клавиатурният фокус – само по контур. */
+header.top :is(.btn,#bRun){background:transparent;border-color:transparent;box-shadow:none;filter:none;color:var(--ink)}   /* #bRun в списъка вдига тежестта на правилото над общите правила за бутони */
+header.top :is(.btn,#bRun) i{color:inherit}
+/* избран панел или отворен прозорец: лилава икона */
+header.top :is(.btn,#bRun)[aria-pressed="true"] i,body:has(#settings.open) header.top #bSet i,body:has(#startModal:not([hidden])) header.top #bRun i{color:var(--acc)}
+/* натискане: кратък лилав фон за всички */
+header.top :is(.btn,#bRun):active{background:var(--press)}
+/* посочване с мишка: лилав текст и икона (на сензорен екран не остава след докосване) */
+@media (hover:hover) and (pointer:fine){
+  header.top :is(.btn,#bRun):hover,header.top :is(.btn,#bRun):hover i{color:var(--acc)}
+}
+/* --- Настройки и връзка --- */
+/* Панел „Настройки“: значка с режима (Монитор / Дистанционно), центрирана в хедъра, без рамка; само при установена връзка */
+#settings .set-mode{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:var(--sp-1);padding:var(--sp-1) var(--sp-2) var(--sp-1) var(--sp-2);border-radius:999px;border:0;outline:0;color:var(--acc);font:700 var(--fs-sm)/1.2 Manrope,system-ui,sans-serif;white-space:nowrap}
+#settings .set-mode[hidden]{display:none}
+#settings .set-mode i{width:14px;height:14px;display:block;flex:none;color:var(--acc)}
+/* --- Основа: променливи, теми, общи елементи --- */
+/* светла тема: редакторът е с бял фон и тъмен текст във всички изгледи */
+/* скролбарове в цвета на акцента */
+/* ---- индикация за активност: контур и светлина вместо запълване (за всички елементи); посочването я подсилва ---- */
+/* ---- визуален слой: дълбочина, меки ъгли и лек акцентен ореол (само в редактора; екранът за четене не се променя) ---- */
+:root{--sb:color-mix(in srgb,var(--acc) 50%,var(--panel2));--sbh:color-mix(in srgb,var(--acc) 78%,var(--panel2));scrollbar-color:var(--sb) transparent;--sh1:0 1px 0 rgba(255,255,255,.04) inset,0 1px 2px rgba(0,0,0,.25);--sh2:0 10px 30px -12px rgba(0,0,0,.55),0 2px 6px -2px rgba(0,0,0,.35)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+body:not(.reading) .top{position:relative;background:color-mix(in srgb,var(--panel) 82%,transparent);border-bottom-color:color-mix(in srgb,var(--line) 70%,transparent)}
+body:not(.reading) .fmt{padding:var(--sp-2) var(--sp-2);background:color-mix(in srgb,var(--panel) 88%,transparent)}
+/* --- Лента за форматиране, избор на цвят и размер --- */
+.fmt .sep{opacity:.7}
+/* --- Настройки и връзка --- */
+.ib,.btn,select,input[type=number],.szbox,.split,.cbtn{border-radius:var(--r-sm)}
+/* --- Основа: променливи, теми, общи елементи --- */
+/* --- Работна област: редактор, превю и управление --- */
+.stagewrap{gap:var(--sp-3)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+body:not(.reading) #editor{border-color:color-mix(in srgb,var(--line) 80%,transparent);transition:border-color var(--t-slow),box-shadow var(--t-slow)}
+/* --- Работна област: редактор, превю и управление --- */
+.foot{padding:var(--sp-0) var(--sp-2);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+/* --- Лента за форматиране, избор на цвят и размер --- */
+.menu,.ddm,.pal{background:var(--panel)}
+/* --- Настройки и връзка --- */
+#settings h3{font-size:var(--fs-md);letter-spacing:.01em}
+/* --- Работна област: редактор, превю и управление --- */
+#editor span[data-note]{background:color-mix(in srgb,var(--note,#4dd6ff) 14%,transparent);border-radius:var(--r-xs)}
+/* --- Основа: променливи, теми, общи елементи --- */
+/* ---- единна система за контроли (последна, за да важи навсякъде):
+   покой: бутон = тъмен фон + тънка рамка; иконен бутон = без фон и рамка; основен бутон = плътен акцент.
+   посочване: само по-светъл фон (без контур и ореол). включено: лек акцентен фон + акцентна рамка 1px (без ореол).
+   фокус от клавиатура: еднакъв акцентен контур 2px. Ореолите са премахнати навсякъде. ---- */
+:root,:root[data-theme]{--glowA:transparent;--glowT:transparent;--glowM:transparent}
+/* --- Горна лента и падащи менюта --- */
+.brand .logo{border-radius:var(--r);box-shadow:none}
+/* --- Основа: променливи, теми, общи елементи --- */
+.btn:not(.primary),select,input[type=number]{background-color:var(--panel2);border:1px solid var(--line);box-shadow:none}
+.btn.primary{background:var(--acc);border:1px solid var(--acc);color:var(--onacc);box-shadow:none}
+.btn.primary:hover{filter:brightness(1.08)}
+@media (hover:hover){
+  .btn:not(.primary):hover,select:hover,input[type=number]:hover,input[type=color]:hover{border-color:var(--line);background-color:var(--hover)}
+}
+@media (hover:hover){
+  /* --- Настройки и връзка --- */
+  .ib:not(.on):not(.play):hover,.seg button:not([aria-pressed="true"]):hover,.bmi:hover,.opt:hover,.menu button:hover,.pal .sw button:hover,.presets button:hover,.ddm .it:hover{box-shadow:none}
+}
+@media (hover:hover){
+  /* --- Основа: променливи, теми, общи елементи --- */
+  .btn.primary:hover{box-shadow:none}
+}
+@media (hover:hover){
+  /* --- Четене (телепромптър) и втори прозорец --- */
+  body :is(#hud,#rBar2) .play:not([aria-pressed="true"]):hover,body #remote .rbar .play:not([aria-pressed="true"]):hover,body #rBar2 #r2Close:hover{box-shadow:none}
+}
+/* --- Настройки и връзка --- */
+.toggles .btn[aria-pressed="true"]{border-color:var(--acc);box-shadow:none}
+/* --- Горна лента и падащи менюта --- */
+.menu button[aria-pressed="true"]{box-shadow:inset 0 0 0 1px var(--acc)}
+/* --- Настройки и връзка --- */
+#netHostSec .net-host-card .phoneUrl{background:var(--panel2);border-radius:var(--r-sm)}
+/* --- Четене (телепромптър) и втори прозорец --- */
+/* панели и менюта: еднаква рамка, ъгъл и сянка */
+body:not(.reading) .fmt,body:not(.reading) #editor,.menu,.ddm,.pal,#imgBar{border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh2)}
+/* форматиращата лента: на цяла ширина, без отстъпи, без закръглени ъгли – само долна линия */
+body:not(.reading) .fmt{margin:0;width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none}
+body:not(.reading) #editor:focus-within{border-color:color-mix(in srgb,var(--acc) 45%,var(--line))}
+body:not(.reading) #editor,body:not(.reading) #editor:focus-within{border:0;border-radius:0;box-shadow:none}
+/* --- Настройки и връзка --- */
+/* размерът не скача при смяна на раздела */
+/* ---- единен слой: еднакви преходи, изключено състояние и ъгъл на всички прозорци ---- */
+.btn,.ib,.seg button,.cbtn,.szbox,.opt,.menu button,.ddm .it,.bmi,select,input[type=number],input[type=color],.pal .sw button,.presets button{transition:background-color var(--t),border-color var(--t),color var(--t),box-shadow var(--t),filter var(--t)}
+/* еднакъв ред във всички раздели на Настройки: същият механизъм като в „Текст“ — редове на 8px, без собствени полета */
+#settings .mkgroup,#settings .set-body > section:not([hidden]){display:flex;flex-direction:column;gap:var(--sp-2)}
+
+
+
+
+#settings .row>label.sw2{flex-direction:row-reverse;justify-content:space-between}
+
+/* Пресети: надпис вляво, квадратчетата вдясно в 3 колони × 2 реда, със ширината на „Добави шрифт“ */
+
+
+
+#settings .set-body{padding-left:var(--sp-3);padding-right:var(--sp-3)}
+#settings .set-card{width:min(460px,100%);height:min(var(--setH,600px),100%)}
+#settings .settabs .btn{position:relative;height:var(--ctl-lg);padding:0 var(--sp-2);font-size:var(--fs-md);gap:var(--sp-2)}
+#settings .settabs .btn i[data-ic]{width:20px;height:20px}
+/* разделител под категориите: същият преливащ акцент като линията на основния прозорец, изчезва вляво и вдясно */
+#settings .settabs{position:relative;padding:var(--sp-0) var(--sp-3)}
+#settings .set-body{padding-bottom:var(--sp-3)}
+#settings h3,.h3row{margin-bottom:var(--sp-2)}
+.row{margin:var(--sp-1) 0}
+.sub{margin-top:var(--sp-1)}
+/* --- Настройки и връзка --- */
+.net-role-bar{margin:0 0 var(--sp-2);padding:var(--sp-2) 0 var(--sp-2)}
+.net-role-lbl{margin:0 0 var(--sp-2);font-size:var(--fs-xl);line-height:1.35;font-weight:700;letter-spacing:.02em}
+#netRoleSec,#netHostSec,#netCliSec{padding-top:var(--sp-2);padding-bottom:var(--sp-2)}
+/* Монитор: адресът и бутоните са най-отдолу в панела, в същата карта като при Дистанционно */
+#setBody[data-tab="conn"]>#netHostSec:not([hidden]),#netHostSec #netHostBody:not([hidden]),#setBody[data-tab="conn"]>#netCliSec:not([hidden]),#setBody[data-tab="conn"]>#netHostSec:not([hidden]),#netHostSec #netHostBody:not([hidden]),#netCliSec .net-cli-stack{flex:1 1 auto;display:flex;flex-direction:column}
+
+.net-cli-stack{gap:var(--sp-2)}
+/* Настройки › Връзка: QR кодът (Монитор) и QR четецът (Дистанционно) са центрирани по вертикала в свободното място между описанието и картата с адреса */
+#netHostSec #netHostBody:not([hidden]) > .rm-qrwrap{flex:1 1 auto;align-items:center;margin:0}
+/* --- Основа: променливи, теми, общи елементи --- */
+.btn.primary:active{background:var(--press)!important}
+.btn.primary kbd{background:var(--panel2);border-color:var(--line);color:var(--mute)}
+/* --- Прозорци, диалози и известия --- */
+#startModal .st-note{width:0;min-width:100%}
+#startModal .opt{--dot:var(--acc)}
+#startModal .st-rem{justify-content:space-between;width:100%;min-height:var(--ctl);font-size:var(--fs-md);line-height:1.35;font-weight:400;color:var(--mute)}
+#startModal .st-rem-t{display:flex;flex-direction:row;align-items:center;gap:var(--sp-2);flex:1 1 auto;min-width:0;white-space:nowrap}   /* текстът и подсказката са на един ред; диалогът се разширява по него */
+#startModal .st-note{font-size:var(--fs-sm);line-height:1.35}
+/* --- Помощ --- */
+#helpModal h4 i{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;margin:0;padding:var(--sp-1);border-radius:var(--r-sm);background:color-mix(in srgb,var(--acc) 14%,transparent);color:var(--acc);vertical-align:baseline}
+/* --- Прозорци, диалози и известия --- */
+/* ---- диалозите, направени от dlg() („Нов текст“, „Име на текста“, „Заменяне на текста“ и др.): същият вид като „Настройки“ ---- */
+.scdlg .modal-card.rm-card{width:min(340px,100%)}
+.scdlg .rm-lead{padding:0 calc(var(--sp-3) + 16px);font-size:var(--fs-sm);line-height:1.35}   /* повече място отляво и отдясно на въпроса */
+.scdlg .rm-row{display:flex;flex-wrap:nowrap;gap:var(--sp-2)}
+.scdlg .rm-row input{flex:1 1 auto;min-width:0;height:var(--ctl);padding:0 var(--sp-3);border:1px solid var(--line);border-radius:var(--r-sm);background:transparent;color:inherit;font-family:inherit;font-size:var(--fs);box-sizing:border-box;outline:0}
+.scdlg .rm-row input:focus,.scdlg .rm-row input:focus-visible{background:transparent;border-color:var(--acc);outline:0}
+/* бутоните „Отказ“ и OK са нормални бутони (Б2); OK за изтриване е червен */
+.scdlg .rm-row .btn{justify-content:center}
+/* --- Лента за форматиране, избор на цвят и размер --- */
+/* ---- изскачащи менюта, падащи списъци и палитра: същите заобляне и отстояния, бутони с фон само при посочване ---- */
+.menu,.ddm,.pal{border-radius:var(--r-lg)}
+.menu:not([hidden]),.ddm:not([hidden]){display:flex;flex-direction:column;gap:var(--sp-1)}
+.menu,.ddm{padding:var(--sp-2)}
+.menu button,.ddm .it{border-radius:var(--r-sm);flex:none}
+.pal:not([hidden]){display:flex;flex-direction:column;gap:var(--sp-2)}
+.pal .btn.btn:not(.cp-ok):not(.cp-cancel),.pal .none,.pal .cp-eye{background:transparent!important;border:1px solid transparent!important;box-shadow:none!important;filter:none!important}
+@media (hover:hover) and (pointer:fine){
+  .pal .btn.btn:not(.cp-ok):not(.cp-cancel):hover,.pal .none:hover,.pal .cp-eye:hover{background:var(--hover)!important}
+}
+/* --- Прозорци, диалози и известия --- */
+#toast,#remBar{border-radius:var(--r-lg)}
+/* --- Странични панели: текстове и отметки --- */
+/* номерата на отметките и текстовете са без квадратче; на текущия ред номерът остава оцветен */
+.bmi .n,#scList .bmi.cur .n,#bmListEdit .bmi.cur .n,#scListRead .bmi.cur .n,#bmListRead .bmi.cur .n{background:none;box-shadow:none}
+/* малките бутончета в списъците (редактиране, „…“, пускане при четене) са квадратни (34 × 34); редът не става по-висок */
+.bmi .act{width:34px;height:34px}
+/* номерата на текстовете и отметките са със същия размер като името; името е на около 12 px от номера (номерът е подравнен вдясно, имената са едно под друго) */
+.bmi .n{font-size:inherit;min-width:2ch;padding:0;margin-right:var(--sp-1);justify-content:flex-end}
+/* --- Настройки и връзка --- */
+/* всички бутони за избор на цвят са квадратни и с размера на останалите бутони: 34 × 34, на телефон 44 × 44 */
+.cbtn{width:var(--ctl);height:var(--ctl)}
+/* пресетите на текста: с размера на бутоните за цвят (34 × 34, на телефон 44 × 44) */
+
+#presets button,#settings .presets-row > #presets button{width:var(--ctl);height:var(--ctl);min-width:0;padding:0;flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r-sm)}
+/* бутоните за цвят и пресетите: цветът изпълва изцяло квадратчето 34 × 34 (остава само тънката рамка около него) */
+.cbtn,#presets button,#settings .presets-row > #presets button{border:0;background:transparent}
+#settings .set-mode svg,.cbtn i{width:100%;height:100%}
+#presets button i{flex:none;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm);border:1px solid var(--line);font-style:normal;font-weight:800;font-size:var(--fs-md);width:100%;height:100%}
+@media (max-width:640px){
+  /* на телефон пресетите са 44 × 44 като другите бутони за цвят: надписът „Пресети“ е отгоре, шестте квадратчета са на цял ред под него */
+  
+  
+  
+}
+/* бутоните за цвят реагират като пресетите: при посочване светват, при натискане потъмняват */
+.cbtn:hover{background:transparent;filter:brightness(1.18)}
+.cbtn:active{filter:brightness(.85)}
+/* Настройки: бутоните „+“ и „−“ са 34 × 34 без фон; фонът се показва при посочване, натискане и Tab */
+#settings .step .ib{width:var(--ctl);height:var(--ctl);background:transparent;border-color:transparent}
+@media (hover:hover){
+  #settings .step .ib:hover{background:var(--hover)}
+}
+#settings .step .ib:active{background:var(--press)}
+/* --- Лента за форматиране, избор на цвят и размер --- */
+/* лентата за форматиране: бутоните за цвят на текста, маркиране и бележка са квадратни (широки колкото са високи); шевронът до тях остава тесен */
+.split .ib:first-child{width:var(--ctl)}
+/* --- Горна лента и падащи менюта --- */
+/* по-голяма горна лента: по-високи бутони, по-големи икони и надписи; бутоните са с еднаква ширина с повече място за по-дълги преводи.
+   Ширините са подбрани така, че „Пусни“ да остава в средата на всяка ширина на екрана. */
+header.top .btn{height:52px;flex-direction:column;justify-content:center;gap:var(--sp-0)}   /* надписът е под иконата */
+@media (min-width:961px){
+  header.top .btn{width:150px;font-size:var(--fs-lg)}
+  header.top .brand .logo{width:38px;height:38px}
+}
+@media (min-width:641px) and (max-width:960px){
+  header.top .btn{width:114px;padding:0 var(--sp-2)}
+}
+@media (max-width:640px){
+  header.top .btn{height:48px}
+  header.top .btn .t{display:none}   /* телефон: в горната лента са само икони */
+}
+/* --- Настройки и връзка --- */
+/* Настройки → Връзка: адресът е на цял ред, под него на отделен ред са бутоните, разпределени поравно (еднаква ширина), най-отдолу е помощният текст.
+   Всички бутони се виждат винаги; недостъпните са бледи. */
+
+
+
+:is(#netHostSec,#netCliSec) :is(.net-addr-box,.net-cli-row) .btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

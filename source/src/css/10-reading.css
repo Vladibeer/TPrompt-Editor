@@ -1,0 +1,138 @@
+/* ======================================================================
+   Четене (телепромптър) и втори прозорец
+   ====================================================================== */
+#prompter,#pv{-webkit-touch-callout:none}
+body.reading{overflow:hidden}
+@media (pointer:coarse){
+  body:not(.reading) #editor{padding-top:72px!important}
+}
+.doc img,#textcol img,#pvText img{max-width:100%;height:auto;vertical-align:middle}
+.doc li>p,#textcol li>p,#pvText li>p{margin:0}
+/* ---------- Prompter ---------- */
+#prompter{contain:layout paint style;position:fixed;inset:0;z-index:50;touch-action:none;overscroll-behavior:none;background:var(--pbg);overflow:hidden;user-select:none;-webkit-user-select:none;color-scheme:dark}
+body.nocursor #prompter{cursor:none}
+#stage{position:absolute;inset:0}
+#stage.fit{box-shadow:0 0 0 1px rgba(128,128,128,.45)}
+#prompter.rot{inset:auto;left:50%;top:50%;transform:translate(-50%,-50%) rotate(90deg)}
+#viewport{position:absolute;inset:0;overflow:hidden}
+#scroller{will-change:transform;position:relative}
+#textcol{width:var(--pw);margin:0 auto;font-family:var(--pfont);font-size:var(--pfs);line-height:var(--plh);color:var(--pcolor);word-wrap:break-word}
+#textcol p,#textcol h1,#textcol h2,#textcol h3,#textcol h4,#textcol h5,#textcol h6,#textcol ul,#textcol ol,#textcol blockquote,#pvText p,#pvText h1,#pvText h2,#pvText h3,#pvText h4,#pvText h5,#pvText h6,#pvText ul,#pvText ol,#pvText blockquote{margin:0 0 var(--ppg,.6em)}
+#textcol h3,#pvText h3{font-size:1.2em}
+#band,#pvBand{top:calc(var(--mkY) - var(--mkH) / 2);height:var(--mkH);background:color-mix(in srgb,var(--mk) 12%,transparent)}
+:is(#hud,#rBar2)::-webkit-scrollbar{display:none}
+:is(#hud,#rBar2).noprog{padding-bottom:var(--sp-1)}
+#hud:not(.open){opacity:0;pointer-events:none;transform:translate(-50%,10px)}
+:is(#hud,#rBar2) .ib{width:var(--ctl-sm);height:var(--ctl-sm);flex:none;color:var(--ink);border-radius:var(--r-sm)}
+:is(#hud,#rBar2) .ib i{width:15px;height:15px}
+:is(#hud,#rBar2) .ib:hover{background:var(--hover)}
+:is(#hud,#rBar2) .play{width:auto;min-width:58px;height:var(--ctl-sm);padding:0 var(--sp-2);gap:var(--sp-1);border-radius:var(--r-sm);background:var(--teal);color:#06231d}
+:is(#hud,#rBar2) .play:hover{background:#5df0d6}
+:is(#hud,#rBar2) .play i{width:16px;height:16px}
+:is(#hud,#rBar2) .grpx:first-child{border-left:0}
+:is(#hud,#rBar2) .grpx>i[data-ic]{width:14px;height:14px}
+:is(#hud,#rBar2) .val{min-width:26px;text-align:center;font-weight:800;font-size:var(--fs-sm);font-variant-numeric:tabular-nums}
+:is(#hud,#rBar2) .meta{min-width:76px;text-align:center;font-weight:700;font-size:var(--fs-sm);white-space:nowrap;font-variant-numeric:tabular-nums}
+:is(#hud,#rBar2) .meta small{color:var(--mute);font-weight:600;font-size:var(--fs-xs);margin-left:var(--sp-1)}
+#hudToggle:hover,#hudToggle.active{opacity:1}
+#hudToggle.idle{opacity:0}
+#hudToggle i{width:16px;height:16px;transition:transform var(--t-slow)}
+#hudToggle.active i{transform:rotate(180deg)}
+#bmPanel,#hud{scrollbar-color:var(--sb) transparent}
+body :is(#hud,#rBar2){zoom:1.2;flex-wrap:wrap;justify-content:center;overflow:visible;width:calc(100% - 16px);max-width:520px;row-gap:var(--sp-2)}
+#prompter[hidden],:is(#hud,#rBar2).noprog .hprog,body #hud #hMk,body #hud #hMH,body #hud #hMV,body #hud #hFull,body #hud #hExit,body #hud .grpx.gm,body #hud .grpx.gt{display:none}
+/* контролният панел е в долната част на екрана и не засяга текста по средата */
+body #hud{bottom:calc(56px + env(safe-area-inset-bottom,0px))}   /* панелът се отваря над бутона „Контроли“ */
+body :is(#hud,#rBar2) .grpx.r1{flex:1 1 0;min-width:0;justify-content:space-around;padding:0 var(--sp-1);border-left:0;order:0}
+body :is(#hud,#rBar2) .grpx.r1+.grpx.r1{border-left:1px solid var(--line)}
+body :is(#hud,#rBar2) :is(#hPlay,#r2Play){order:2;flex:2 1 0;width:auto;min-width:0}
+body :is(#hud,#rBar2) .grpx.r2{order:3;flex:2 1 0;min-width:0;padding:0}
+body :is(#hud,#rBar2) .grpx.r2 .ib{flex:1 1 0;width:auto;min-width:0}
+body :is(#hud,#rBar2) .grpx{order:2}
+body :is(#hud,#rBar2) .brk{display:block;flex:0 0 100%;height:0;order:1}
+body #hudToggle:active{background:var(--float-press)}
+body:not(.rc) #hudToggle:hover{background:var(--float-bg)}
+body #hudToggle.idle{opacity:0;pointer-events:none}
+/* телефон/таблет: Android не винаги съобщава височината на статус лентата, затова Х слиза под нея */
+/* при дистанционно управление и цял екран: бутонът за контролите е същият като „Х“ */
+/* ред горе вдясно, навсякъде еднакъв: „Х“, бутон за панела, „Цял екран“ (само във втория прозорец на Windows) */
+/* втори прозорец с текст: цял екран / изход от цял екран, вляво от бутона за изход */
+/* ---- Вертикален списък вляво по средата, отварян от един полупрозрачен бутон, който не се скрива ---- */
+/* при отворен панел „Отметки“ (излиза отляво) бутоните се крият, за да не го закриват */
+/* ниски екрани (хоризонтално): списъкът остава под бутона, с по-малки бутони; ако пак не се побира, се превърта */
+/* ---- Бутон „Контроли“ (шеврон) долу в средата; „Цял екран“, „Завърти“ и „Затвори“ са в долния ред на контролния панел ---- */
+body #hudToggle{width:var(--ctl-lg);height:var(--ctl-lg);border-radius:var(--r-sm);background:var(--float-bg);border:1px solid var(--float-line);color:var(--float-ink);box-shadow:var(--sh-float);opacity:1;transition:opacity var(--t-slow),background var(--t);left:50%;right:auto;top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateX(-50%)}
+/* бутоните запълват панела: горе скорост и размер (по половина), долу старт, отметки/настройки, в началото (най-вдясно) */
+/* втори ред: старт/пауза заема 1/3, останалите бутони (текстове, отметки, настройки, начало, завърти, затвори) делят равномерно другите 2/3 */
+body :is(#hud,#rBar2) .grpx.g1,body #hud .grpx.r2,body #hud .grpx.rx{display:contents}
+body.viewer:not(.android) #hud #hPlay{flex:3.5 1 0}   /* във втория прозорец има и „Цял екран“, затова остава 1/3 */
+.foot .sv svg{width:13px;height:13px;color:var(--teal)}
+#clBadge.show{opacity:1;transform:translateX(-50%)}
+#clBadge i[data-ic]{width:16px;height:16px;flex:none;color:var(--acc)}
+#clBadge b{flex:none;font-weight:800;font-variant-numeric:tabular-nums;min-width:3ch;text-align:right}
+#clBadge .dots span{flex:none;width:5px;height:5px;border-radius:50%;background:var(--line)}
+#clBadge .dots span.on{background:var(--acc)}
+#ctlLock #rBar2{position:relative;left:auto;bottom:auto;transform:none;opacity:1;pointer-events:auto;z-index:auto;margin:0 auto;flex:none}
+/* старите контроли на дистанционното са заменени от същия панел като при цял екран */
+body.reading #imgTool,body.viewer #imgTool,body.noprog .rprog,#remote .rbar,#remote .rprog{display:none!important}
+#remote.active #pv::after,#ctlPv::after{content:"";position:absolute;inset:0;border:1px solid color-mix(in srgb,var(--teal) 45%,transparent);border-radius:inherit;pointer-events:none;z-index:8}
+body.rc #remote{background:none;border:0;padding:0;margin:var(--sp-2) var(--sp-3)}
+#remote .rbar .ib{width:var(--ctl-sm);height:var(--ctl-sm);color:var(--float-ink);border-radius:var(--r-sm)}
+#remote .rbar .ib:hover{background:var(--float-press)}
+body #hud .grpx.r2 .ib i,body #hud #hHome i,body #hud .grpx.rx .ib i,#remote .rbar .ib i{width:16px;height:16px}
+#remote .rbar .play{width:auto;min-width:58px;height:var(--ctl);padding:0 var(--sp-3);gap:var(--sp-2);border-radius:var(--r-sm);background:var(--teal);color:#06231d}
+#remote .rbar .play:hover{background:#5df0d6}
+#remote .rbar b{min-width:30px;text-align:center;font-size:var(--fs-sm);font-variant-numeric:tabular-nums}
+.rprog::before{content:"";position:absolute;left:0;right:0;top:5px;height:4px;border-radius:var(--r-xs);background:rgba(255,255,255,.18)}
+@media (hover:none) and (pointer:coarse){
+  /* ---------- Режим „дистанционно“ на малък екран: превю горе, контроли долу ---------- */
+  #remote .rbar .ib{width:var(--ctl-sm);height:var(--ctl-sm)}
+  #remote .rbar .ib i{width:20px;height:20px}
+  #remote .rbar .play{height:var(--ctl);min-width:76px}
+}
+#embBox iframe,#rvBox iframe{width:100%;height:100%;border:0;display:block}
+@media (max-width:900px){
+  body:is(.rc,.nt):not(.reading)[data-rcv=bm] #bmRSide{display:flex}
+  body:not(.reading) :is(#bmSide,#bmRSide) .close{display:none!important}   /* при четене на цял екран панелите са слоеве със собствен хедър и бутон за затваряне */
+  body.rc #remote .rprog::before,body.rc #remote .rprog i{top:12px;height:6px;border-radius:var(--r-xs)}
+  body.rc #remote .rprog::before{background:var(--line)}
+  body.rc #remote .rbar .ib i{width:24px;height:24px}
+  body.rc #remote .rbar .ib:active{background:var(--press)}
+  body.rc #remote .rbar .play i{width:28px;height:28px}
+  body.rc #remote .rbar .rg > i{width:22px;height:22px;margin-left:var(--sp-2);color:var(--mute);flex:none}
+  body.rc #remote .rbar .rg .ib{border:0;background:none;width:var(--ctl-xl);height:var(--ctl-xl)}
+  body.rc #remote .rbar .rg .ib:active{background:var(--press)}
+  body.rc #remote .rbar .rg b{flex:1;text-align:center;font-size:var(--fs-xl);font-weight:800;min-width:0;color:var(--ink)}
+}
+body.viewer.vempty:not(.reading)::before{content:attr(data-empty);position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:var(--sp-5);text-align:center;font-size:var(--fs-xl);line-height:1.4;color:var(--mut,#8a8fb0)}
+body.viewer.vempty:not(.reading) #vBar{display:flex;position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;gap:var(--sp-2);z-index:50}
+/* същият вид като бутона за изход при четене (#xExit) */
+#vBar button{width:var(--ctl-lg);height:var(--ctl-lg);padding:0;align-items:center;justify-content:center;border-radius:var(--r-sm);background:var(--float-bg);border:1px solid var(--float-line);color:var(--float-ink);box-shadow:var(--sh-float);transition:background var(--t);cursor:pointer}
+body #hudToggle i,#vBar button i{width:22px;height:22px}
+#vBar button:active{background:var(--float-press)}
+@media (max-width:640px){
+  #hud .ib{width:var(--ctl);height:var(--ctl)}
+  #hud .ib i{width:17px;height:17px}
+  #hud .play{width:auto;min-width:64px;height:var(--ctl)}
+  #hud .play i{width:20px;height:20px}
+  #hud .val{min-width:28px;font-size:var(--fs-md)}
+}
+.ctlhead>i[data-ic]{width:34px;height:34px;color:var(--teal);margin-top:var(--sp-0)}
+.ctlhead b{display:block;font-size:var(--fs-xl);font-weight:800;margin-bottom:var(--sp-1)}
+#textcol h1,#pvText h1,#ctlText h1{font-size:1.6em}
+#textcol h2,#pvText h2,#ctlText h2{font-size:1.4em}
+#textcol h4,#textcol h5,#textcol h6,#pvText h4,#pvText h5,#pvText h6,#ctlText h4,#ctlText h5,#ctlText h6{font-size:1.05em}
+#textcol h1,#textcol h2,#textcol h3,#textcol h4,#textcol h5,#textcol h6,#pvText h1,#pvText h2,#pvText h3,#pvText h4,#pvText h5,#pvText h6,#ctlText h1,#ctlText h2,#ctlText h3,#ctlText h4,#ctlText h5,#ctlText h6{line-height:1.2}
+#textcol ul,#textcol ol,#pvText ul,#pvText ol,#ctlText ul,#ctlText ol{padding-left:1.3em}
+#ctlTake{height:var(--ctl-lg);justify-content:center}
+@media (max-width:900px){
+  body.rc #pv{border-radius:0}
+  html:has(body.rc.rcLive){padding-bottom:0}
+}
+body:is(.rc,.nt):not(.reading)[data-rcv=sc] #bmSide{display:flex}
+:is(#hud,#rBar2) .ib:not(.on):not(.play):not(#r2Close):active{background:var(--press)}
+body :is(#hud,#rBar2) .play>i:first-child,body #remote .rbar .play>i:first-child{color:var(--teal)}
+body:not(.reading) .top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--acc) 55%,transparent) 30%,color-mix(in srgb,var(--acc) 55%,transparent) 70%,transparent);pointer-events:none}
+/* редакторът е разпънат по цялото пространство: без външни отстъпи, рамка, закръглени ъгли и сянка (превюто под него запазва отстъпите си) */
+body:not(.reading):not(.rc):not(.nt) .stagewrap{padding:0}
+body:not(.reading):not(.rc):not(.nt) .stagewrap #remote{margin:0 var(--sp-4) var(--sp-4)}

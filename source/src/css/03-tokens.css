@@ -1,0 +1,49 @@
+/* =====================================================================
+   ЕДИННА ДИЗАЙН СИСТЕМА (токени). Всички размери, отстояния, радиуси, сенки и цветове
+   на интерфейса се вземат оттук; суровите стойности в правилата са заменени с тези променливи.
+   ===================================================================== */
+:root{--sp-0:2px;--sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:24px;--r-xs:2.8px;--r-sm:4.2px;--r:7px;--r-lg:9.8px;--ctl-sm:28px;--ctl:34px;--ctl-lg:44px;--ctl-xl:52px;--row-opt:52px;--fs-xs:11px;--fs-sm:12px;--fs:13px;--fs-md:14px;--fs-lg:15px;--fs-xl:17px;--t:.15s;--t-slow:.25s;--dis:.4;--danger:#dd323a;--danger-ink:#ff5d66;--float-bg:rgba(18,19,22,.82);--float-line:rgba(255,255,255,.14);--float-ink:#ececf0;--float-press:rgba(255,255,255,.14);--sh-float:0 10px 30px -10px rgba(0,0,0,.6);--sh-modal:0 30px 80px -20px rgba(0,0,0,.7);--ring:0 0 0 3px color-mix(in srgb,var(--acc) 35%,transparent)}
+@media (max-width:640px){
+  :root{--ctl:44px}
+}
+:root[data-theme="light"]{--bg:#eceefb;--panel:#ffffff;--panel2:#f1f2fd;--line:#e0e4f7;--ink:#161a3a;--mute:#5b629a;--hover:#e1e4fa;color-scheme:light}
+:root[data-theme="dark"]{--bg:#111214;--panel:#1a1b1e;--panel2:#232529;--line:#2f3137;--ink:#ececf0;--mute:#9b9da7;--hover:#2d2f35;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%;overflow:clip}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:500 var(--fs-md)/1.4 Manrope,system-ui,sans-serif;overflow:clip;overscroll-behavior:none}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+i[data-ic]{display:inline-flex;width:18px;height:18px;flex:none}
+i[data-ic] svg{width:100%;height:100%}
+kbd{font:600 var(--fs-xs) Manrope,sans-serif;padding:var(--sp-0) var(--sp-2);border-radius:var(--r-xs);border:1px solid var(--line);background:var(--panel2);color:var(--mute)}
+/* безопасна зона под тулбара: родното меню за селекция се отваря над текста */
+#app{display:flex;flex-direction:column;height:100%;overflow:clip}   /* clip: не може да се превърта и програмно (селекция в редактора) */
+/* „Мрежа“ е в Настройки: иконата на състоянието е без цвят (като текста), бутонът е на цялата ширина */
+#bRemote i[data-ic]{color:inherit}
+#bRemote{flex:1;justify-content:center}
+#miXfer.off{color:var(--mute)}
+.btn:hover,.ib:hover{background:var(--hover)}
+select,input[type=number]{height:var(--ctl);background:var(--panel2);padding:0 var(--sp-2);outline:none}
+input[type=number]:focus{background-color:var(--hover)}
+select:focus,select:focus-visible{border-color:var(--line);box-shadow:none}
+input[type=number]{-moz-appearance:textfield;appearance:textfield;font-weight:700;font-variant-numeric:tabular-nums}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+#sizeSel{display:none}
+#imgGrip{position:absolute;right:-9px;bottom:-9px;width:16px;height:16px;border-radius:var(--r-sm);background:var(--acc);border:2px solid #fff;cursor:nwse-resize;pointer-events:auto;touch-action:none}
+@media (hover:none) and (pointer:coarse){
+  .kbd-only,.spc{display:none!important}
+}
+/* текстът във всички падащи менюта е центриран (равен отстъп от двете страни заради стрелката) */
+select{appearance:none;-webkit-appearance:none;color:var(--ink);font-weight:600;cursor:pointer;background:var(--panel2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%238b8d97' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 9px center/12px 12px;-webkit-tap-highlight-color:transparent}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+:root[data-theme="light"]{--sh1:0 1px 0 rgba(255,255,255,.8) inset,0 1px 2px rgba(22,26,58,.08);--sh2:0 12px 32px -14px rgba(22,26,58,.22),0 2px 6px -2px rgba(22,26,58,.08)}
+/* Бележки [ ] за четящия: цветът е общ (--note) и се сменя от лентата; в редактора има и лек фон */
+span[data-note]{color:var(--note,#4dd6ff)}
+/* без шеврони в падащите списъци (select) */
+select,select:hover,select:focus,select:focus-visible{background-image:none!important;padding-left:var(--sp-3)!important;padding-right:var(--sp-3)!important;text-align:center;text-align-last:center;text-indent:0}
+select option{background:var(--panel);color:var(--ink);font-weight:500;text-align:center}
+/* на телефон контролите са по-големи за пръст */
+/* ---- компактен слой: прозорците и настройките вземат височината на съдържанието си, без разтегнати и празни зони ---- */
+:root{--bg:#111214;--panel:#1a1b1e;--panel2:#232529;--line:#2f3137;--ink:#ececf0;--mute:#9b9da7;--acc:#6f5dff;--teal:#14eac1;--amber:#ffb547;--rose:#ff5c7e;--hover:#2d2f35;--press:color-mix(in srgb,var(--acc) 30%,var(--panel2));--pfs:64px;--plh:1.35;--ppg:.6em;--pw:82%;--pcolor:#fff;--pbg:#000;--pfont:"Open Sans",sans-serif;--onacc:#fff;--mk:#ffb547;--mkY:42%;--mkH:140px;--dim:rgba(0,0,0,.55);color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--hdr:48px}

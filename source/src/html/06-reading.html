@@ -1,0 +1,56 @@
+<!-- ==================== НАЧАЛО: Четене (телепромптър) ==================== -->
+<div id="prompter" hidden>
+    <div id="bmPanel" aria-label="Bookmarks" data-tab="bm">
+    <div class="bmhead"><b class="ptitle" data-p="bm"><i data-ic="bookmark"></i><span>Bookmarks</span></b><b class="ptitle" data-p="sc"><i data-ic="text"></i><span>Library</span></b><button class="ib" id="bmClose" title="Close (B)"><i data-ic="x"></i></button></div>
+    <div class="bmlist" id="bmListRead"></div>
+    <div id="scReadSec" hidden><div class="bmlist" id="scListRead"></div></div>
+  </div>
+  <div id="stage">
+    <div id="viewport"><div id="scroller"><div id="textcol" class="doc"></div></div></div>
+    <div class="dim" id="dimTop"></div>
+    <div class="dim" id="dimBot"></div>
+    <div id="band"></div>
+  </div>
+  <button id="hudToggle" title="Show or hide controls (C)" aria-label="Controls"><i data-ic="chevU"></i></button>
+  <div id="hud">
+    <div class="grpx g1">
+      <button class="ib" id="hHome" title="Start Over (Home)"><i data-ic="home"></i></button>
+      <button class="ib play" id="hPlay" title="Play / pause (Space)"><i data-ic="play"></i><i class="spc" data-ic="space"></i></button>
+    </div>
+    <div class="hprog" id="hProg" title="Progress"><i id="hProgFill"></i></div>
+    <div class="grpx r1" title="Speed">
+      <i data-ic="gauge" style="margin:0 var(--sp-1);color:var(--mute)"></i>
+      <button class="ib" id="hSpdDn" title="Slower"><i data-ic="minus"></i></button>
+      <span class="val" id="hSpd">15</span>
+      <button class="ib" id="hSpdUp" title="Faster"><i data-ic="plus"></i></button>
+    </div>
+    <div class="grpx r1" title="Text size">
+      <i data-ic="type" style="margin:0 var(--sp-1);color:var(--mute)"></i>
+      <button class="ib" id="hFsDn" title="Smaller (−)"><i data-ic="minus"></i></button>
+      <span class="val" id="hFs">64</span>
+      <button class="ib" id="hFsUp" title="Larger (+)"><i data-ic="plus"></i></button>
+    </div>
+    <i class="brk"></i>
+    <div class="grpx gm">
+      <button class="ib" id="hMk" title="Marker (M)"><i data-ic="marker"></i></button>
+      <button class="ib" id="hMH" title="Mirror horizontally (H)"><i data-ic="flipH"></i></button>
+      <button class="ib" id="hMV" title="Mirror vertically (V)"><i data-ic="flipV"></i></button>
+    </div>
+    <div class="grpx gt">
+      <div class="meta"><span id="hTime">0:00</span><small id="hPct">0%</small></div>
+    </div>
+    <div class="grpx r2">
+      <button class="ib" id="hSc" title="Library (T)"><i data-ic="text"></i></button>
+      <button class="ib" id="hBm" title="Bookmarks (B)"><i data-ic="bookmark"></i></button>
+      <button class="ib" id="hSet" title="Settings (S)"><i data-ic="sliders"></i></button>
+      <button class="ib" id="hFull" title="Full screen (F)"><i data-ic="max"></i></button>
+      <button class="ib" id="hExit" title="Back to editor (E or Esc)"><i data-ic="edit"></i></button>
+    </div>
+    <div class="grpx rx">
+      <button class="ib" id="xFs" type="button" title="Full screen" aria-label="Full screen"><i data-ic="max"></i></button>
+      <button class="ib" id="xRot" type="button" title="Rotate screen" aria-label="Rotate screen"><i data-ic="rotScreen"></i></button>
+      <button class="ib" id="xExit" type="button" title="Back to editor (E or Esc)" aria-label="Go to the editor"><i data-ic="x"></i></button>
+    </div>
+  </div>
+</div>
+<!-- ==================== КРАЙ: Четене (телепромптър) ==================== -->

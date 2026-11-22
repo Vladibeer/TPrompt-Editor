@@ -1,0 +1,67 @@
+/* ======================================================================
+   Прозорци, диалози и известия
+   ====================================================================== */
+#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);z-index:100;max-width:min(560px,92vw);padding:var(--sp-3) var(--sp-4);background:var(--float-bg);color:#fff;border:1px solid var(--float-line);box-shadow:var(--sh2);opacity:0;pointer-events:none;transition:opacity var(--t-slow),transform var(--t-slow);font-weight:600}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.err{border-color:var(--rose)}
+.modal-body .bmi.static{cursor:default}
+#startModal .opt::after{content:"";width:10px;height:10px;margin-left:auto;flex:none;border-radius:50%;background:transparent;box-shadow:inset 0 0 0 2px var(--mute)}
+#startModal #bRemote.link{--dot:var(--teal)}
+#startModal #bRemote.warn{--dot:var(--amber)}
+#startModal #bRemote.off:not(.warn){--dot:var(--danger-ink)}
+.st-rem input{appearance:none;-webkit-appearance:none;width:20px;height:20px;flex:none;margin:0;border:1.5px solid color-mix(in srgb,var(--acc) 70%,transparent);border-radius:var(--r-sm);background:transparent;cursor:pointer;display:grid;place-items:center;transition:background var(--t),box-shadow var(--t)}
+.st-rem input::after{content:"";width:10px;height:6px;border:solid var(--onacc);border-width:0 0 2.5px 2.5px;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+.st-rem input:checked{background:var(--acc);border-color:var(--acc);box-shadow:none}
+.st-rem input:checked::after{opacity:1}
+.st-rem:hover input,.st-rem input:focus-visible{box-shadow:var(--ring)}
+.rm-row input{flex:1 1 180px;min-width:0;height:var(--ctl);border-radius:var(--r-sm);border:1px solid var(--line);background:var(--panel2);padding:0 var(--sp-3);font-size:var(--fs-md);outline:none}
+@media (max-width:900px){
+  body.rc #toast{bottom:calc(190px + env(safe-area-inset-bottom,0px))}
+}
+/* ---- Изскачащ прозорец (категория М2) — общо правило за всички прозорци върху интерфейса:
+   Настройки, „Пусни“, „Експортирай“, „Помощ“, менюто „…“ на текст, потвърждения, преименуване, размяна, шрифтове.
+   Отделният прозорец задава само ширината и съдържанието си. ---- */
+.modal{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:var(--sp-4);background:rgba(0,0,0,.55);animation:scrimIn var(--t) ease both}   /* затъмняването се появява плавно заедно с прозореца, а не изведнъж */
+.modal[hidden]{display:none}
+.modal-card{width:min(760px,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-modal);animation:modalIn var(--t) ease both}
+/* горен ред: икона в акцентен цвят, заглавие, бутон „Затвори“ (X) */
+.modal-card>header{position:sticky;top:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);flex:none;min-height:var(--hdr);padding:var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-4);border:0;background:var(--panel);font-size:var(--fs-lg)}
+.modal-card>header b{display:flex;align-items:center;gap:var(--sp-2);min-width:0;margin:0;font-size:var(--fs-lg);font-weight:800;line-height:1.2}
+.modal-card>header b>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* съдържание: еднакви отстояния, превърта се само то */
+.modal-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-color:var(--sb) transparent;padding:var(--sp-2) var(--sp-3) var(--sp-3);line-height:1.4}
+.modal-body::-webkit-scrollbar{width:10px}
+.modal-body::-webkit-scrollbar-track{background:transparent}
+.modal-body::-webkit-scrollbar-thumb{background:var(--sb);border-radius:var(--r-xs);border:2px solid transparent;background-clip:padding-box}
+.modal-body::-webkit-scrollbar-thumb:hover{background:var(--sbh)}
+/* съдържание от редове един под друг, на равни разстояния */
+.modal-body.opts{display:flex;flex-direction:column;gap:var(--sp-2)}
+.modal-body.opts>*{margin:0}
+/* ред с избор (категория М3): без фон, сива икона, светва при посочване; „Изтрий“ е червено */
+.opt{display:flex;align-items:center;gap:var(--sp-3);width:100%;min-height:var(--row-opt);margin:0;padding:var(--sp-2) var(--sp-3);border:1px solid transparent;border-radius:var(--r-sm);background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer;box-shadow:none;outline:0}
+.opt>i[data-ic]{width:20px;height:20px;flex:none;color:var(--mute)}
+.opt>span{display:flex;flex-direction:column;min-width:0;font-size:var(--fs-md);font-weight:700;line-height:1.25}
+.opt small{margin-top:var(--sp-0);color:var(--mute);font-size:var(--fs-xs);font-weight:500}
+.opt.danger,.opt.danger>i[data-ic]{color:var(--danger-ink)}
+.opt:disabled{opacity:var(--dis);pointer-events:none}
+.opt:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.opt:active{background:var(--press)}
+@media (hover:hover) and (pointer:fine){
+  .opt:hover{background:var(--hover)}
+}
+/* заглавие на група редове („Този текст“, „Всички текстове“) */
+.ex-sec{color:var(--ink);font-size:var(--fs-md);font-weight:800;letter-spacing:.01em}
+.modal-card>header b i,.modal-body h4 i{color:var(--acc)}
+.modal-body b>i.hi{width:15px;height:15px;vertical-align:-3px;margin-right:var(--sp-1);color:var(--acc)}
+.modal-body p{margin:0 0 var(--sp-2)}
+.modal-body ul,.modal-body ol{margin:0 0 var(--sp-2);padding-left:var(--sp-4)}
+#startModal .opt.on::after,#startModal #bRemote.link::after,#startModal #bRemote.warn::after,#startModal #bRemote.off:not(.warn)::after{background:var(--dot);box-shadow:0 0 0 3px color-mix(in srgb,var(--dot) 25%,transparent)}
+.modal-body h4{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-md);font-weight:800;margin:var(--sp-3) 0 var(--sp-1)}
+.modal-body li{margin:var(--sp-0) 0}
+/* ширината е по най-дългото име на бутон („Покажи от свързаното устройство“), дори когато той е скрит, за да не се мени размерът; бележката и подсказката се пренасят и не го разширяват */
+#startModal .modal-card::after{content:"Покажи от свързаното устройство";display:block;height:0;overflow:hidden;visibility:hidden;white-space:nowrap;padding:0 106px;font-size:var(--fs-md);font-weight:700}
+#remBar .btn.btn{background:transparent!important;border:1px solid transparent!important;box-shadow:none!important;filter:none!important}
+@media (hover:hover) and (pointer:fine){
+  #remBar .btn.btn:hover{background:var(--hover)!important}
+}
+#startModal #rmShow.on::after{display:block}

@@ -1,0 +1,197 @@
+<!-- ==================== НАЧАЛО: Настройки ==================== -->
+<div id="settings" class="modal" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+  <div class="modal-card set-card">
+    <header><b id="setTitle"><i data-ic="sliders"></i><span>Settings</span></b><span class="set-mode" id="setMode" hidden><i id="setModeI"></i><span id="setModeT"></span></span><button class="ib" id="bCloseSet" type="button" title="Close"><i data-ic="x"></i></button></header>
+    <div class="settabs" id="setTabs" role="tablist" aria-label="Settings categories">
+      <button type="button" class="btn" role="tab" data-tab="read"><i data-ic="play"></i><span class="t">Reading</span></button>
+      <button type="button" class="btn" role="tab" data-tab="text"><i data-ic="type"></i><span class="t">Text</span></button>
+      <button type="button" class="btn" role="tab" data-tab="conn"><i data-ic="globe"></i><span class="t">Connection</span></button>
+      <button type="button" class="btn" role="tab" data-tab="gen"><i data-ic="sliders"></i><span class="t">General</span></button>
+    </div>
+    <div class="modal-body set-body" id="setBody" data-tab="read">
+
+      <section data-cat="text" id="readGlobSec">
+        <span class="net-role-lbl">Global text settings</span>
+      </section>
+
+      <section data-cat="read" class="nb">
+        <span class="net-role-lbl">Reading settings</span>
+      </section>
+
+      <section data-cat="read">
+        <div class="h3row"><h3><i data-ic="gauge"></i>Speed</h3>
+          <div class="step" title="Speed">
+            <button class="ib" data-bump="speed" data-d="-5" title="Slower"><i data-ic="minus"></i></button>
+            <input type="number" data-key="speed" min="1" max="100" step="1" aria-label="Speed">
+            <button class="ib" data-bump="speed" data-d="5" title="Faster"><i data-ic="plus"></i></button>
+          </div>
+        </div>
+        <div class="row"><label class="sw2"><input type="checkbox" data-key="invert"><span class="tr"></span>Swap up and down</label></div>
+        <p class="sub kbd-only" id="arrowHint"></p>
+        <p class="sub touch-only" id="tapHint"></p>
+      </section>
+
+      <section data-cat="text">
+        <div class="h3row"><h3><i data-ic="type"></i>Font</h3><select id="fontG" data-key="font" aria-label="Font"></select></div>
+        <div class="row font-imp-row"><button type="button" class="btn" id="fontImp" title="Add your own fonts (.ttf, .otf, .woff, .woff2)"><i data-ic="upload"></i><span>Add font</span></button></div>
+        <div class="row"><label for="fsN">Size</label>
+          <div class="step">
+            <button class="ib" data-bump="fs" data-d="-1" title="Smaller (−)"><i data-ic="minus"></i></button>
+            <input type="number" id="fsN" data-key="fs" min="20" max="240" step="2">
+            <button class="ib" data-bump="fs" data-d="1" title="Larger (+)"><i data-ic="plus"></i></button>
+          </div>
+        </div>
+        <div class="row"><label for="lhN">Line spacing</label>
+          <div class="step"><button class="ib" data-bump="lh" data-d="-0.05" title="Less"><i data-ic="minus"></i></button><input type="number" id="lhN" data-key="lh" min="1" max="2.4" step="0.05"><button class="ib" data-bump="lh" data-d="0.05" title="More"><i data-ic="plus"></i></button></div></div>
+        <div class="row"><label for="pgN">Paragraph spacing</label>
+          <div class="step"><button class="ib" data-bump="pgap" data-d="-0.1" title="Less"><i data-ic="minus"></i></button><input type="number" id="pgN" data-key="pgap" min="0" max="1.5" step="0.1"><button class="ib" data-bump="pgap" data-d="0.1" title="More"><i data-ic="plus"></i></button></div></div>
+        <div class="row"><label for="wN">Width</label>
+          <div class="step"><button class="ib" data-bump="width" data-d="-5" title="Narrower"><i data-ic="minus"></i></button><input type="number" id="wN" data-key="width" min="30" max="100" step="1"><button class="ib" data-bump="width" data-d="5" title="Wider"><i data-ic="plus"></i></button></div></div>
+        <div class="row"><label>Text</label><input type="color" data-key="color"></div>
+        <div class="row"><label>Background</label><input type="color" data-key="bg"></div>
+        <div class="row presets-row"><span class="l">Presets</span><div class="presets" id="presets"></div></div>
+      </section>
+      <section data-cat="gen" id="genPrefSec">
+        <span class="net-role-lbl">Preferences</span>
+      </section>
+
+      <section data-cat="gen">
+        <div class="h3row"><h3><i data-ic="text"></i>Spell check</h3><label class="sw2" title="Underlines misspelled words in the editor (system spell check)"><input type="checkbox" data-key="spell" aria-label="Spell check"><span class="tr"></span></label></div>
+      </section>
+
+      <section data-cat="read">
+        <h3><i data-ic="flipH"></i>Mirror</h3>
+        <div class="toggles">
+          <button class="btn" data-toggle="mirrorH" aria-pressed="false" title="Key H"><i data-ic="flipH"></i>Horizontal</button>
+          <button class="btn" data-toggle="mirrorV" aria-pressed="false" title="Key V"><i data-ic="flipV"></i>Vertical</button>
+        </div>
+      </section>
+
+      <section data-cat="read">
+        <div class="h3row"><h3><i data-ic="gauge"></i>Progress bar</h3><label class="sw2" title="Show in the control panel"><input type="checkbox" data-key="progress" aria-label="Progress bar"><span class="tr"></span></label></div>
+      </section>
+
+      <section data-cat="read">
+        <div class="h3row"><h3><i data-ic="marker"></i>Reading marker</h3><label class="sw2" title="Show marker"><input type="checkbox" data-key="marker" aria-label="Reading marker"><span class="tr"></span></label></div>
+        <div class="mkgroup" id="mkgroup">
+          <div class="row"><label>Position</label><div class="step"><button class="ib" data-bump="markerY" data-d="-2" title="Less"><i data-ic="minus"></i></button><input type="number" id="mYR" data-key="markerY" min="10" max="90" step="1"><button class="ib" data-bump="markerY" data-d="2" title="More"><i data-ic="plus"></i></button></div></div>
+          <div class="row"><label>Height</label><div class="step"><button class="ib" data-bump="markerH" data-d="-10" title="Less"><i data-ic="minus"></i></button><input type="number" id="mHR" data-key="markerH" min="40" max="800" step="2"><button class="ib" data-bump="markerH" data-d="10" title="More"><i data-ic="plus"></i></button></div></div>
+          <div class="row"><label title="Dims the text outside the marker area. Keys M, [ and ]">Dimming</label><div class="step"><button class="ib" data-bump="dim" data-d="-5" title="Less"><i data-ic="minus"></i></button><input type="number" id="mDR" data-key="dim" min="0" max="90" step="1"><button class="ib" data-bump="dim" data-d="5" title="More"><i data-ic="plus"></i></button></div></div>
+          <div class="row"><label>Color</label><input type="color" id="mC" data-key="markerColor"></div>
+        </div>
+      </section>
+
+      <section data-cat="gen">
+        <div class="h3row"><h3><i data-ic="palette"></i>Theme</h3><select id="themeSel" aria-label="Theme"><option value="light">Light</option><option value="dark">Dark</option></select></div>
+        <div class="ui-colors ggrp"><label title="Accent color">Accent<input type="color" id="cAcc"></label><label title="Interface background">Background<input type="color" id="cUiBg"></label><button class="btn" id="uiReset" type="button" title="Colors apply to the interface, not to the teleprompter text. Changing the theme resets them.">Reset colors</button></div>
+      </section>
+
+      <section data-cat="gen">
+        <div class="h3row"><h3><i data-ic="play"></i>Starting</h3><select id="startSel" aria-label="Starting"><option value="ask">Ask every time</option><option value="full">Full screen</option><option value="win">In a window</option></select></div>
+      </section>
+
+            <!-- скрит индикатор за състоянието на връзката: JS (updateOpenLabel, status, ui) разчита на #bRemote и вложените му елементи -->
+      <div id="bRemote" hidden aria-hidden="true"><i id="bRemoteSI" data-ic="netOff"></i><span id="bRemoteT"></span><span id="bRemoteS"></span><i id="bRemoteAI" data-ic="link"></i><span id="bRemoteA"></span></div>
+      <section data-cat="conn" id="netRoleSec" style="padding-bottom:0">
+        <div class="net-role-bar">
+          <span class="net-role-lbl" id="netRoleLbl">Use this device as</span>
+          <div class="seg net-role-seg" role="tablist" id="netRoleSeg">
+            <button type="button" class="btn on" role="tab" id="netTabHost" data-role-tab="host" aria-controls="netHostSec" aria-selected="true" title="Monitor" onclick="pickNetRole('host')"><i data-ic="monitor"></i><span id="netTabHostT">Monitor</span></button>
+            <button type="button" class="btn" role="tab" id="netTabCli" data-role-tab="cli" aria-controls="netCliSec" aria-selected="false" title="Remote" onclick="pickNetRole('cli')"><i data-ic="swap"></i><span id="netTabCliT">Remote</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section data-cat="conn" id="netHostSec" class="net-role-panel" role="tabpanel" aria-labelledby="netTabHost">
+        <div class="h3row">
+          <h3><i data-ic="monitor"></i><span id="netHostTitle">Monitor</span></h3>
+          <span class="sub" id="netHostSt">Waiting for a connection…</span>
+        </div>
+        <p class="sub" style="margin:0 0 var(--sp-3)" id="netHostDesc">This device shows the text for reading. Scan the QR code with the remote.</p>
+        <p class="sub" id="netHostNoSupport" hidden style="margin:0 0 var(--sp-3)">This browser works only as a Remote. For Monitor, use the Windows or Android app.</p>
+
+        <div id="netHostBody">
+          <div class="rm-qrwrap"><canvas id="netHostQr"></canvas></div>
+          <div class="net-cli-card net-host-card">
+          <div class="net-addr-box">
+            <div class="phoneUrl" id="netHostUrl" title="Click to select"></div>
+            <div class="ggrp net-btns">
+            <button class="btn" id="netHostNew" type="button" title="Makes the old address invalid"><i data-ic="refresh"></i><span>New code</span></button>
+            <button class="btn" id="netHostCopy" type="button" title="Copy address"><i data-ic="copy"></i><span>Copy</span></button>
+            <button class="btn" id="netHostOff" type="button" title="Disconnect&#8203;" disabled><i data-ic="x"></i><span>Disconnect</span></button>
+            </div>
+          </div>
+            <label class="net-cli-lbl" id="netHostAddrLbl">Use this IP address to connect the remote.</label>
+          </div>
+        </div>
+
+        <div id="netHostInactive" hidden>
+          <div class="net-acts-row" style="margin-top:var(--sp-2)">
+            <button class="btn" id="netHostActivate" type="button"><i data-ic="qr"></i><span>Switch to Monitor mode</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section data-cat="conn" id="netCliSec" class="net-role-panel" role="tabpanel" aria-labelledby="netTabCli" hidden style="display:none">
+        <div class="h3row">
+          <h3><i data-ic="swap"></i><span id="netCliTitle">Remote</span></h3>
+          <span class="sub" id="netCliSt">Not connected</span>
+        </div>
+        <p class="sub" style="margin:0 0 var(--sp-3)" id="netCliDesc">This device controls the reading. Scan the monitor’s QR code or enter its address.</p>
+
+        <div id="netCliBody" class="net-cli-stack">
+          <div id="netCliCam" class="net-cli-cam" hidden>
+            <video id="netCliVideo" playsinline muted></video>
+            <button class="ib" id="netCliCamClose" type="button" title="Close camera"><i data-ic="x"></i></button>
+          </div>
+          <div class="net-cli-ph net-cli-ph-cam">
+            <button class="btn net-cli-scan" id="netCliScan" type="button"><i data-ic="scan"></i><span>Scan QR code</span></button>
+          </div>
+
+          <div class="net-cli-card">
+            <div class="net-cli-row">
+              <input id="netCliAddr" class="net-cli-input" type="text" inputmode="url" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="http://192.168.1.5:8723/?t=…">
+              <div class="ggrp net-btns">
+              <button class="btn" id="netCliCopy" type="button" title="Copy address"><i data-ic="copy"></i><span>Copy</span></button>
+              <button class="btn primary" id="netCliGo" type="button" title="Connect"><i data-ic="link"></i><span>Connect</span></button>
+              <button class="btn" id="netCliOff" type="button" title="Disconnect&#8203;" disabled><i data-ic="x"></i><span>Disconnect</span></button>
+              </div>
+            </div>
+            <label class="net-cli-lbl" for="netCliAddr" id="netCliAddrLbl">Enter the monitor’s IP address here</label>
+          </div>
+
+          
+        </div>
+      </section>
+
+      <section data-cat="gen">
+        <div class="h3row"><h3><i data-ic="globe"></i>Language</h3><select id="langSel" aria-label="Language"><option value="bg">Български</option><option value="en">English</option></select></div>
+      </section>
+
+
+      
+
+      <section data-cat="gen">
+        <div class="h3row"><h3><i data-ic="keyboard"></i>Presenter clicker control</h3><label class="sw2" title="Control prompting with a presenter or clicker"><input type="checkbox" data-key="clicker" aria-label="Presenter clicker control"><span class="tr"></span></label></div>
+      </section>
+
+      <section data-cat="gen" id="lfPollSec">
+        <div class="h3row"><h3><i data-ic="refresh"></i>Sync linked file</h3><label class="sw2" title="Syncs changes in the linked file from a local or network drive."><input type="checkbox" data-key="lfPoll" aria-label="Sync linked file"><span class="tr"></span></label></div>
+      </section>
+
+      <section data-cat="gen" id="autoSec" hidden>
+        <div class="h3row"><h3><i data-ic="monitor"></i>Start with Windows</h3><label class="sw2" title="Start TPrompt minimized when you sign in to Windows"><input type="checkbox" id="autoTgl" aria-label="Start with Windows"><span class="tr"></span></label></div>
+      </section>
+
+      <section data-cat="gen">
+        <div class="h3row"><h3><i data-ic="text"></i>Encoding of .txt files</h3><select id="encSel" data-key="txtEnc" aria-label="Encoding of .txt files"></select></div>
+      </section>
+
+      <section data-cat="gen" id="helpSec">
+        <div class="h3row"><button class="ib" id="bHelp" type="button" title="Help" aria-label="Help"><i data-ic="help"></i></button></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+<!-- ==================== КРАЙ: Настройки ==================== -->

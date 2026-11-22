@@ -1,0 +1,141 @@
+/* ======================================================================
+   Настройки и връзка
+   ====================================================================== */
+/* един и същ ефект за всички полета и бутони: посочване = по-светъл фон, без рамка и контур */
+select:hover,input[type=number]:hover,input[type=color]:hover,.step .ib:hover{background-color:var(--hover)}
+.cbtn i{border-radius:var(--r-sm);border:1px solid var(--line);flex:none}
+/* Настройки: прозорец като „Помощ“ – в редактора, при четене (цял екран, прозорец, втори екран) и на Android */
+#settings{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:calc(var(--sp-4) + env(safe-area-inset-top,0px)) calc(var(--sp-4) + env(safe-area-inset-right,0px)) calc(var(--sp-4) + env(safe-area-inset-bottom,0px)) calc(var(--sp-4) + env(safe-area-inset-left,0px));background:rgba(0,0,0,.55);color:var(--ink)}
+#settings.open{display:flex}
+body.reading #settings{background:rgba(0,0,0,.3)}   /* при четене текстът зад прозореца остава видим, за да се виждат промените */
+#settings .set-body{flex:1 1 auto;min-height:0;padding:0 var(--sp-4) var(--sp-4);line-height:1.4;overscroll-behavior:contain;scrollbar-color:var(--sb) transparent}
+@media (max-width:640px){
+  #settings{padding:calc(var(--sp-2) + env(safe-area-inset-top,0px)) calc(var(--sp-2) + env(safe-area-inset-right,0px)) calc(var(--sp-2) + env(safe-area-inset-bottom,0px)) calc(var(--sp-2) + env(safe-area-inset-left,0px))}
+  #settings .set-body{padding:0 var(--sp-3) var(--sp-4)}
+}
+:is(#bmSide,#bmRSide) .bmside-h h3{margin:0;gap:var(--sp-2);font-size:var(--fs-lg);font-weight:800;line-height:1.2}
+/* Настройки по категории: лента с раздели, показва се само избраният */
+#settings .settabs{display:flex;flex:none;gap:var(--sp-0);background:var(--panel)}
+#settings .settabs .btn{flex:1 1 0;min-width:0;justify-content:center}
+/* същият стил като горната лента (Библиотека, Редактор, Отметки, Пусни): без фон и рамка, акцент при посочване, активният се познава по иконата */
+@media (max-width:480px){
+  #settings .settabs .btn:not([aria-selected="true"]) .t{display:none}
+}
+#settings h3{display:flex;align-items:center;gap:var(--sp-2);margin:0 0 var(--sp-3);font-weight:800}
+.row > label,.row > span.l{flex:0 1 92px;min-width:0;color:var(--mute);font-size:var(--fs)}
+#settings .h3row h3,.h3row h3,#settings section > .row:only-child{margin:0}
+.h3row select{flex:1;min-width:0;max-width:190px}
+
+
+
+
+.row > label.sw2{flex:1 1 auto;color:var(--ink);font-size:var(--fs-md)}
+input[type=range]{-webkit-appearance:none;appearance:none;height:22px;margin:0;background:transparent;cursor:pointer;--p:50%}
+input[type=range]:focus{outline:none}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:var(--r-sm);background:linear-gradient(to right,var(--acc) var(--p),var(--line) var(--p))}
+input[type=range]::-moz-range-track{height:6px;border-radius:var(--r-sm);background:var(--line)}
+input[type=range]::-moz-range-progress{height:6px;border-radius:var(--r-sm);background:var(--acc)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-6px;border-radius:50%;background:#fff;border:0;box-shadow:0 0 0 3px var(--acc),0 2px 6px rgba(0,0,0,.35);transition:transform var(--t),box-shadow var(--t)}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:0;box-shadow:0 0 0 3px var(--acc),0 2px 6px rgba(0,0,0,.35)}
+input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.12)}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
+input[type=range]:focus-visible::-webkit-slider-thumb{transform:scale(1.12)}
+.row input[type=number]{width:68px}
+.row input[type=range],.row select{flex:1;min-width:0}
+.row input[type=color]{width:var(--ctl-lg);height:var(--ctl);padding:var(--sp-0);border:1px solid var(--line);border-radius:var(--r-sm);background:var(--panel2)}
+.sw2 input{position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none}
+.sw2 .tr::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform var(--t)}
+.sw2 input:checked + .tr{background:var(--teal)}
+.sw2 input:checked + .tr::after{transform:translateX(16px)}
+.sw2:hover input:checked + .tr,.sw2 input:focus-visible:checked + .tr{filter:brightness(1.12)}
+.sw2:active .tr{filter:brightness(.9)}
+.presets button{width:54px;height:var(--ctl);border-radius:var(--r-sm);border:1px solid var(--line);font-weight:800;font-size:var(--fs-lg)}
+
+/* Настройки: всички бутони с надпис и падащи списъци са с еднакъв размер — 188 широки и високи колкото останалите бутони;
+   ако елементът не се побира до надписа или до съседа си, минава на следващия ред, подравнен вдясно */
+
+
+
+
+
+.keys dt{display:flex;gap:var(--sp-1);flex-wrap:wrap}
+.keys dd{margin:0;color:var(--mute)}
+#bmPanel::-webkit-scrollbar,#setBody::-webkit-scrollbar{width:10px}
+#bmPanel::-webkit-scrollbar-track,#setBody::-webkit-scrollbar-track{background:transparent}
+#bmPanel::-webkit-scrollbar-thumb,#setBody::-webkit-scrollbar-thumb{background:var(--sb);border-radius:var(--r-xs);border:2px solid transparent;background-clip:padding-box}
+:is(#bmSide,#bmRSide) .sub{margin:var(--sp-3) var(--sp-1) 0}
+.seg button{height:var(--ctl);padding:0 var(--sp-3);border:0;background:none;font-weight:800;font-size:var(--fs-sm);letter-spacing:.4px;color:var(--mute)}
+#setBody[data-tab="read"]>section:not([data-cat="read"]):not([data-cat="all"]),#setBody[data-tab="text"]>section:not([data-cat="text"]):not([data-cat="all"]),#setBody[data-tab="look"]>section:not([data-cat="look"]):not([data-cat="all"]),#setBody[data-tab="conn"]>section:not([data-cat="conn"]):not([data-cat="all"]),#setBody[data-tab="gen"]>section:not([data-cat="gen"]):not([data-cat="all"]),#settings .close,.net-cli-stack.linked .net-cli-ph{display:none}   /* при установена връзка заместителите не са нужни */
+#netRoleSec{padding-bottom:0!important}
+#settings #readGlobSec,#settings #genPrefSec,#settings section[data-cat="read"].nb{padding-top:var(--sp-4)!important;padding-bottom:var(--sp-3)!important}
+#settings .set-body > section:first-child,#settings .set-body > section.nb,#settings #readGlobSec+section,#settings #genPrefSec+section,#settings #netHostSec,#settings #netCliSec{border-top:0}
+#netHostDesc,#netCliDesc,#netHostNoSupport{font-size:var(--fs-sm);line-height:1.35;margin:0 0 var(--sp-2)!important}
+/* „Сканирай QR код“: като бутоните от горната лента – без фон и рамка, иконата над текста */
+#netCliSec #netCliScan{flex-direction:column;justify-content:center;gap:var(--sp-2);width:100%;height:100%;padding:0 var(--sp-1);border:0;border-radius:var(--r-sm);background:transparent;color:var(--ink);font-size:var(--fs-sm);font-weight:800;box-shadow:none;filter:none}
+#netCliSec #netCliScan [data-ic]{width:32px;height:32px}
+/* раздели горе, „Монитор“ / „Дистанционно“ и „Сканирай QR код“: като горната лента — без фон; лилава икона за избрания,
+   лилав текст при посочване с мишка, кратък лилав фон при натискане, контур при клавиатура */
+#settings :is(.settabs .btn,.net-role-seg .btn,#netCliScan){background:transparent;border-color:transparent;box-shadow:none;filter:none;color:var(--ink)}
+#settings .settabs .btn[aria-selected="true"] i{color:var(--acc)}
+#settings :is(.settabs .btn,.net-role-seg .btn,#netCliScan):active{background:var(--press)}
+@media (hover:hover) and (pointer:fine){
+  #settings :is(.settabs .btn,.net-role-seg .btn,#netCliScan):hover,#settings :is(.settabs .btn,.net-role-seg .btn,#netCliScan):hover i{color:var(--acc)}
+}
+#settings .settabs .btn:focus-visible,#settings .net-role-seg .btn:focus-visible,#netCliSec #netCliScan:focus-visible{outline:2px solid var(--acc)}
+
+/* Монитор: „Копирай“ и „Прекъсни“ изглеждат като при Дистанционно */
+
+
+
+.net-cli-cam video{height:100%;width:100%;max-height:220px;object-fit:cover;display:block}
+@media (max-width:640px){
+  .presets button{width:48px}
+}
+#bmPanel::-webkit-scrollbar-thumb:hover,#setBody::-webkit-scrollbar-thumb:hover{background:var(--sbh)}
+/* смяна на раздел в настройките: съдържанието влиза от посоката на избрания раздел */
+#setBody.tab-fwd>section{animation:slideInRight var(--t-slow) ease}
+#setBody.tab-back>section{animation:slideIn var(--t-slow) ease}
+#settings .settabs::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--acc) 55%,transparent) 30%,color-mix(in srgb,var(--acc) 55%,transparent) 70%,transparent);pointer-events:none}
+/* Мрежа: „Копирай“ и „Свържи“ (и останалите бутони там) – като всички други бутони */
+#settings :is(#netHostSec,#netCliSec) .btn:not(.primary):not(#netCliScan){background:var(--panel2);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:none;filter:none;font-weight:700}
+#settings :is(#netHostSec,#netCliSec) .btn.primary:not(#netCliScan){border-radius:var(--r-sm);font-weight:700}
+@media (hover:hover){
+  #settings :is(#netHostSec,#netCliSec) .btn:not(.primary):not(#netCliScan):hover{background:var(--hover);border-color:var(--line)}
+  #settings :is(#netHostSec,#netCliSec) .btn.primary:not(#netCliScan):hover{filter:brightness(1.08)}
+}
+/* бутоните във „Връзка“: кратък лилав фон при натискане, като останалите бутони */
+#settings :is(#netHostSec,#netCliSec) .btn.btn.btn:not(#netCliScan):active{background:var(--press)!important}   /* тежестта е над правилата за посочване на „Свържи“ */
+/* фокус от клавиатура – един и същ за всички */
+/* избор с клавиатура: само лилав контур, без промяна на фона — за всички бутони, полета и редове */
+:is(.btn,.ib,select,input,.menu button,.seg button,.ddm .it,.bmi .tt,.bmi .act,.opt,.pal .sw button,.presets button,.szchev,.cbtn):focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+header.top .btn:focus-visible,#settings .settabs .btn:focus-visible,#settings .net-role-seg .btn:focus-visible,#netCliSec #netCliScan:focus-visible{outline-offset:-2px}
+/* без хоризонтални разделители в менюто: настройки (секции, заглавие, раздели) и падащи менюта */
+#settings section,#settings header,#settings .settabs,#settings .net-role-bar{border-top:0!important;border-bottom:0!important}
+#settings{--net-sq:150px;--ctlw:188px}
+
+
+#settings .set-body > section > *{margin:0!important}
+
+
+
+
+#settings section{border-top:1px solid var(--line);border-top-color:color-mix(in srgb,var(--line) 70%,transparent);padding:var(--sp-2) 0}
+
+
+
+/* ---- основен бутон: напълно като всички останали (същия фон, същата рамка, без акцентен контур) ---- */
+.btn.primary,.net-cli-stack .btn.primary,#settings :is(#netHostSec,#netCliSec) .btn.primary:not(#netCliScan){background:var(--panel2)!important;border:1px solid var(--line)!important;color:var(--ink)!important;filter:none!important;box-shadow:none!important}
+@media (hover:hover){
+  .btn.primary:hover,.net-cli-stack .btn.primary:hover,#settings :is(#netHostSec,#netCliSec) .btn.primary:not(#netCliScan):hover{background:var(--hover)!important}
+}
+/* Настройки → Връзка: съдържанието е свалено надолу; помощният текст най-отдолу е на същото разстояние от долния край, колкото е отстоянието отляво (12 px) */
+#setBody[data-tab="conn"]>#netRoleSec{padding-top:calc(var(--sp-2) + var(--sp-2))}
+#setBody[data-tab="conn"]>#netHostSec,#setBody[data-tab="conn"]>#netCliSec{padding-bottom:0}
+/* Настройки → Връзка: QR кодът и четецът са 80% от свободното място по височина между описанието и адреса (размерът се изчислява при показване) */
+
+#setBody[data-tab="conn"] #netCliBody,#setBody[data-tab="conn"] #netHostBody{margin-top:calc(-1 * var(--sp-2))!important}   /* свободното място започва точно под описанието, за да е кодът по средата */
+/* Настройки: иконите пред имената на функциите и опциите (Скорост, Шрифт, Тема…) са без фон; размерът и подравняването са същите */
+#settings h3 i{color:var(--acc);display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:var(--sp-1);border-radius:var(--r-sm);background:none}
+   /* адресът е на цял ред над бутоните */
+
+:is(#netHostSec,#netCliSec) .btn:disabled{opacity:var(--dis);cursor:default;pointer-events:none}

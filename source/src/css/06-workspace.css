@@ -1,0 +1,40 @@
+/* ======================================================================
+   Работна област: редактор, превю и управление
+   ====================================================================== */
+#editor{flex:1 1 0;min-height:120px;overflow:auto;background:var(--panel);color:var(--ink);font-family:var(--pfont);font-size:24px;line-height:var(--plh);border:1px solid var(--line);border-radius:var(--r);padding:28px max(var(--sp-5),calc((100% - var(--pw)) / 2));outline:none;word-wrap:break-word}
+#editor::selection,#editor *::selection{background:color-mix(in srgb,var(--acc) 55%,transparent)}
+.doc p,.doc h1,.doc h2,.doc h3,.doc h4,.doc h5,.doc h6,.doc ul,.doc ol,.doc blockquote{margin:0 0 var(--ppg,.6em)}
+.doc h1{font-size:1.6em}
+.doc h2{font-size:1.4em}
+.doc h3{font-size:1.2em}
+.doc h4,.doc h5,.doc h6{font-size:1.05em}
+.doc ul,.doc ol{padding-left:1.3em}
+#editor img{cursor:pointer}
+#editor .ProseMirror{outline:none;min-height:100%;word-wrap:break-word}
+#editor .ProseMirror img.ProseMirror-selectednode{outline:none}
+#editor .ProseMirror-gapcursor{display:none}
+.doc li{margin:0 0 .15em}
+#imgTool{position:fixed;z-index:60;display:none;pointer-events:none;border:2px solid var(--acc);border-radius:var(--r-xs)}
+#imgTool.on{display:block}
+#imgBar{position:absolute;left:-2px;bottom:calc(100% + 8px);display:flex;align-items:center;gap:var(--sp-0);padding:var(--sp-1);background:var(--panel);color:var(--ink);pointer-events:auto;white-space:nowrap}
+#imgTool.below #imgBar{bottom:auto;top:calc(100% + 8px)}
+#imgBar .ib{width:auto;min-width:34px;height:var(--ctl-sm);padding:0 var(--sp-2);font-weight:700;font-size:var(--fs-sm)}
+#imgBar .sep{height:20px}
+.doc h1,.doc h2,.doc h3,.doc h4,.doc h5,.doc h6{line-height:1.2}
+#dimTop,#pvDimTop{top:0;height:calc(var(--mkY) - var(--mkH) / 2);background:var(--dim)}
+#dimBot,#pvDimBot{top:calc(var(--mkY) + var(--mkH) / 2);bottom:0;background:var(--dim)}
+.hprog::before{content:"";position:absolute;left:0;right:0;bottom:9px;height:4px;border-radius:var(--r-xs);background:var(--line)}
+body #rBar2 :is(#r2Play,#r2Full,#r2Home,#r2Close){padding:0}
+body:not(.rc) #rBar2 #r2Play{flex:2 1 0}
+#remote #rBar2{position:relative;left:auto;bottom:auto;transform:none;opacity:1;pointer-events:auto;z-index:auto;margin:0 auto;flex:none}
+@media (max-width:900px){
+  body:is(.rc,.nt) .stagewrap{display:contents}
+  body:is(.rc,.nt) #edCard #editor{display:block;flex:1 1 0;min-height:0;margin:0;border:0;border-radius:0;box-shadow:none;overflow:auto;padding:var(--sp-3) var(--sp-3);background:var(--panel);color:var(--ink)}
+}
+.stagewrap.pvfull #remote{flex:1 1 0;min-height:0}
+.stagewrap.pvfull #pvWrap{flex:1 1 0;min-height:0;height:auto!important}
+#pvToast.show{opacity:1}
+@media (max-width:640px){
+  #pvGrip,#remote{display:none!important}
+}
+body #rBar2 #r2Close i{color:var(--danger-ink)}

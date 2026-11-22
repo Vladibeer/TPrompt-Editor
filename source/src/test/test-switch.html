@@ -1,0 +1,76 @@
+<!-- ==================== TEST-ONLY:BEGIN (тестов превключвател Windows/Android; маха се от zip файла за издаване) ==================== -->
+<style>
+#tpTestSw{position:fixed;left:6px;bottom:6px;z-index:2147483647;font:600 12px/1.2 system-ui,sans-serif;background:#c2185b;color:#fff;border:0;border-radius:6px;padding:5px 6px;opacity:.85;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+html.tptest .rm-qrwrap{position:relative}
+html.tptest .rm-qrwrap::after{content:"QR код (тест)";position:absolute;left:50%;top:50%;width:var(--net-sq);height:var(--net-sq);transform:translate(-50%,-50%);box-sizing:border-box;display:flex;align-items:center;justify-content:center;text-align:center;background:repeating-linear-gradient(45deg,#2a2c31 0 10px,#33363c 10px 20px);color:#ddd;font:700 13px system-ui,sans-serif;border-radius:4px}
+html.tptest #netCliCam video{display:none}
+html.tptest #netCliCam::before{content:"Камера / скенер за QR (тест)";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;background:repeating-linear-gradient(45deg,#1d1f23 0 10px,#26282d 10px 20px);color:#ddd;font:700 13px system-ui,sans-serif}
+</style>
+<script>(function(){
+  var M='';try{M=localStorage.getItem('tp.testPlat')||''}catch(e){}
+  window.__TP_TEST=M;
+  if(M==='win'||M==='android'){
+    document.documentElement.classList.add('tptest');
+    var tok='TEST'+Math.random().toString(36).slice(2,6).toUpperCase(),rw=null;
+    var info=function(){return {token:tok,url:'http://192.168.1.10:8080/?k='+tok}};
+    var C={
+      remote_start:function(){return info()},remote_new_token:function(){tok='TEST'+Math.random().toString(36).slice(2,6).toUpperCase();return info()},
+      remote_stop:function(){return null},remote_set_content:function(){return null},remote_want:function(){return null},
+      remote_sync:function(){return M==='android'?{v:[]}:[]},rx_pump:function(){return {rxAgo:null,webAgo:null,msgs:[]}},
+      tx_clear:function(){return null},tx_push:function(){return null},
+      monitor_count:function(){return 1},autostart_get:function(){return false},autostart_set:function(){return null},
+      open_reader:function(){if(!rw||rw.closed)rw=window.open(location.href.split('#')[0]+'#view','tprompt_view','popup=yes,width=1280,height=720');else rw.focus();return null},
+      close_reader:function(){if(rw&&!rw.closed)rw.close();return null},reader_open:function(){return !!(rw&&!rw.closed)}
+    };
+    var call=function(c,a){return new Promise(function(res,rej){if(C[c])res(C[c](a||{}));else rej(new Error('Не е налично в тестовия режим: '+c))})};
+    if(M==='win'){
+      window.__TAURI_INTERNALS__={invoke:call};
+      if(Math.min(screen.width,screen.height)<900){var vm=document.querySelector('meta[name=viewport]');if(vm)vm.setAttribute('content','width=1280, viewport-fit=cover')}   /* на телефон: изгледът за компютър, смален */
+    }else{
+      try{Object.defineProperty(navigator,'userAgent',{get:function(){return 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36'}})}catch(e){}
+      var P={};Object.keys(C).forEach(function(k){P[k]=function(a){return call(k,a)}});
+      window.Capacitor={getPlatform:function(){return 'android'},isNativePlatform:function(){return true},Plugins:{TPServer:P,
+        FileSaver:{save:function(o){try{var b=o.b64?Uint8Array.from(atob(o.data),function(c){return c.charCodeAt(0)}):o.data;var u=URL.createObjectURL(new Blob([b],{type:o.mime||'application/octet-stream'}));var a=document.createElement('a');a.href=u;a.download=o.name||'file';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000)}catch(e){return Promise.reject(e)}return Promise.resolve({})}}}};
+    }
+    /* Android на широк екран (компютър): страницата се свива до екран на телефон (412×915), за да се вижда интерфейсът за телефон.
+       Размерът, проверките на екрана (@media, matchMedia) и докосването се подменят; на истински телефон нищо от това не се прави. */
+    if(M==='android'&&Math.min(screen.width,screen.height)>=600){
+      var FW=412,FH=915,RW=window.innerWidth,RH=window.innerHeight;
+      try{['innerWidth','outerWidth'].forEach(function(k){Object.defineProperty(window,k,{get:function(){return FW},configurable:true})});
+          ['innerHeight','outerHeight'].forEach(function(k){Object.defineProperty(window,k,{get:function(){return FH},configurable:true})});
+          ['width','availWidth'].forEach(function(k){Object.defineProperty(screen,k,{get:function(){return FW},configurable:true})});
+          ['height','availHeight'].forEach(function(k){Object.defineProperty(screen,k,{get:function(){return FH},configurable:true})});
+          Object.defineProperty(navigator,'maxTouchPoints',{get:function(){return 5},configurable:true});
+          window.ontouchstart=null;}catch(e){}
+      var realMM=window.matchMedia.bind(window);
+      var feat=function(f){f=f.trim().replace(/^\(|\)$/g,'').trim();var m=f.match(/^(min|max)-(width|height)\s*:\s*([\d.]+)px$/);
+        if(m){var v=m[2]==='width'?FW:FH,n=+m[3];return m[1]==='min'?v>=n:v<=n}
+        if(/^orientation\s*:\s*portrait$/.test(f))return FH>=FW;if(/^orientation\s*:\s*landscape$/.test(f))return FW>FH;
+        if(/^hover\s*:\s*none$/.test(f))return true;if(/^hover\s*:\s*hover$/.test(f))return false;
+        if(/^pointer\s*:\s*coarse$/.test(f))return true;if(/^pointer\s*:\s*fine$/.test(f))return false;
+        if(/^any-pointer\s*:\s*coarse$/.test(f))return true;if(/^any-hover\s*:\s*hover$/.test(f))return false;
+        return realMM('('+f+')').matches};
+      var evalMQ=function(q){return String(q).split(',').some(function(part){part=part.trim();var neg=/^not\s+/.test(part);part=part.replace(/^not\s+/,'').replace(/^(only\s+)?(all|screen)\s*(and\s*)?/,'');
+        var ok=part===''||part.split(/\s+and\s+/).every(feat);return neg?!ok:ok})};
+      window.matchMedia=function(q){return {matches:evalMQ(q),media:q,addEventListener:function(){},removeEventListener:function(){},addListener:function(){},removeListener:function(){},onchange:null}};
+      var fixCss=function(){[].forEach.call(document.styleSheets,function(sh){var rs;try{rs=sh.cssRules}catch(e){return}
+        (function walk(list){[].forEach.call(list,function(r){if(r.media&&r.type===4){var t=r.media.mediaText;if(!r.__tpQ)r.__tpQ=t;var on=evalMQ(r.__tpQ);
+          try{r.media.mediaText=on?'all':'not all'}catch(e){}}if(r.cssRules)walk(r.cssRules)})})(rs)})};
+      var k=Math.min(1,(RH-16)/FH,(RW-16)/FW);
+      var st=document.createElement('style');
+      st.textContent='html.tpfr{background:#3a3d44;height:100%;overflow:hidden}html.tpfr body{position:absolute!important;left:50%;top:8px;width:'+FW+'px!important;height:'+FH+'px!important;min-height:0!important;margin:0!important;overflow:hidden!important;transform:translateX(-50%) scale('+k+');transform-origin:top center;outline:1px solid #000;box-shadow:0 0 0 8px #1b1c1f}';
+      document.head.appendChild(st);document.documentElement.classList.add('tpfr');
+      document.addEventListener('DOMContentLoaded',fixCss);addEventListener('load',fixCss);
+    }
+    /* скенерът: вместо камера се показва заместител */
+    document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('#netCliScan');if(!b)return;e.stopImmediatePropagation();e.preventDefault();var c=document.getElementById('netCliCam');if(c)c.hidden=false},true);
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    if(location.hash==='#view')return;
+    var s=document.createElement('select');s.id='tpTestSw';s.title='Тестов режим (не е част от програмата)';
+    [['','ТЕСТ: Браузър'],['win','ТЕСТ: Windows'],['android','ТЕСТ: Android']].forEach(function(o){var x=document.createElement('option');x.value=o[0];x.textContent=o[1];if(o[0]===M)x.selected=true;s.appendChild(x)});
+    s.addEventListener('change',function(){try{if(s.value)localStorage.setItem('tp.testPlat',s.value);else localStorage.removeItem('tp.testPlat')}catch(e){}location.reload()});
+    document.body.appendChild(s);
+  });
+})();</script>
+<!-- ==================== TEST-ONLY:END ==================== -->
