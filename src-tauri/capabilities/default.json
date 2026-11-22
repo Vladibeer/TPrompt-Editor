@@ -2,12 +2,20 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Разрешения за главния и втория прозорец",
-  "windows": ["main", "reader"],
+  "windows": [
+    "main",
+    "reader"
+  ],
   "permissions": [
     "core:default",
     "dialog:default",
     "autostart:allow-enable",
     "autostart:allow-disable",
-    "autostart:allow-is-enabled"
+    "autostart:allow-is-enabled",
+    "core:window:allow-set-size",
+    "core:window:allow-set-position",
+    "core:window:allow-set-fullscreen",
+    "core:window:allow-maximize",
+    "core:window:allow-show"
   ]
 }

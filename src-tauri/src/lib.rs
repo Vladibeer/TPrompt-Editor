@@ -1,7 +1,7 @@
 //! TPrompt за Windows: обвивка около www/index.html.
 //!
 //! Команди, които страницата вика през `window.__TAURI__.core.invoke`:
-//!  - запазване на файл, втори прозорец за четене (втори монитор), брой монитори;
+//!  - запазване на файл, файлове със запомнена връзка (отваряне, запис, проверка за промяна), втори прозорец за четене (втори монитор), брой монитори;
 //!  - малък HTTP сървър за дистанционно управление (приложението на телефона и уеб страница);
 //!  - старт с Windows.
 
@@ -13,6 +13,7 @@ use serde_json::{json, Value};
 use tauri::{AppHandle, Manager, PhysicalPosition, State, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt as AutostartExt};
 use tauri_plugin_dialog::DialogExt;
+use base64::{engine::general_purpose::STANDARD as B64, Engine as _};
 
 const REMOTE_HTML: &str = include_str!("remote.html");
 const FIRST_PORT: u16 = 8723;
@@ -248,9 +249,9 @@ fn info(inner: &Arc<Mutex<Inner>>) -> Value {
 // ---------------------------------------------------------------- команди
 
 #[tauri::command]
-async fn save_file(app: AppHandle, name: String, data: String) -> Result<bool, String> {
+async fn save_file(app: AppHandle, name: String, data: String, b64: Option<bool>) -> Result<bool, String> {
     let ext = name.rsplit('.').next().unwrap_or("txt").to_lowercase();
-    let label = if ext == "html" { "HTML" } else { "Текст" };
+    let label = if ext == "docx" { "Word" } else if ext == "odt" { "OpenDocument" } else if ext == "rtf" { "RTF" } else { "Текст" };
     let picked = app
         .dialog()
         .file()
@@ -260,11 +261,141 @@ async fn save_file(app: AppHandle, name: String, data: String) -> Result<bool, S
     match picked {
         Some(p) => {
             let path = p.into_path().map_err(|e| e.to_string())?;
-            std::fs::write(path, data.as_bytes()).map_err(|e| e.to_string())?;
+            let bytes = if b64.unwrap_or(false) {
+                B64.decode(data.as_bytes()).map_err(|e| e.to_string())?   /* двоични файлове (.docx) идват като base64 */
+            } else {
+                data.into_bytes()
+            };
+            std::fs::write(&path, bytes).map_err(|e| format!("Не мога да запиша „{}“: {}", path.display(), e))?;
             Ok(true)
         }
         None => Ok(false),
     }
+}
+
+// ---------------------------------------------------------------- файлове със запомнена връзка
+// „Отвори“ запомня пътя до файла (в облачна папка като Google Drive за компютър или pCloud Drive), за да се пише обратно в него.
+
+fn link_ext_ok(path: &str) -> bool {
+    let ext = path.rsplit('.').next().unwrap_or("").to_lowercase();
+    matches!(ext.as_str(), "docx" | "odt" | "rtf" | "txt")
+}
+
+fn file_info(path: &std::path::Path) -> Value {
+    let name = path
+        .file_name()
+        .map(|n| n.to_string_lossy().to_string())
+        .unwrap_or_default();
+    let meta = std::fs::metadata(path).ok();
+    let mt = meta
+        .as_ref()
+        .and_then(|m| m.modified().ok())
+        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0);
+    let writable = meta.as_ref().map(|m| !m.permissions().readonly()).unwrap_or(false);
+    let size = meta.as_ref().map(|m| m.len()).unwrap_or(0);
+    json!({ "uri": path.to_string_lossy(), "name": name, "mime": "", "mt": mt, "size": size, "writable": writable })
+}
+
+/// Четене на файл с резервни методи. Виртуалните дискове (Google Drive, OneDrive и др.) понякога връщат
+/// „Incorrect function (os error 1)“ при обикновено четене, затова: 1) std::fs::read, 2) четене на парчета
+/// (без заявка за размера на файла), с няколко опита, 3) копиране във временна папка и четене на копието.
+fn read_chunked(path: &std::path::Path) -> std::io::Result<Vec<u8>> {
+    use std::io::Read;
+    let mut f = std::fs::File::open(path)?;
+    let mut buf = Vec::new();
+    let mut chunk = vec![0u8; 65536];
+    loop {
+        let n = f.read(&mut chunk)?;
+        if n == 0 {
+            break;
+        }
+        buf.extend_from_slice(&chunk[..n]);
+    }
+    Ok(buf)
+}
+
+fn read_file_robust(path: &std::path::Path) -> Result<Vec<u8>, String> {
+    let mut last = match std::fs::read(path) {
+        Ok(b) => return Ok(b),
+        Err(e) => e,
+    };
+    for attempt in 0..3 {
+        if attempt > 0 {
+            std::thread::sleep(std::time::Duration::from_millis(300));
+        }
+        match read_chunked(path) {
+            Ok(b) => return Ok(b),
+            Err(e) => last = e,
+        }
+    }
+    let tmp = std::env::temp_dir().join(format!("tprompt-read-{}.tmp", std::process::id()));
+    let copied = std::fs::copy(path, &tmp).and_then(|_| read_chunked(&tmp));
+    let _ = std::fs::remove_file(&tmp);
+    match copied {
+        Ok(b) => Ok(b),
+        Err(e) => Err(format!(
+            "Не мога да прочета „{}“: {} (първа грешка: {})",
+            path.display(),
+            e,
+            last
+        )),
+    }
+}
+
+#[tauri::command]
+async fn lf_pick(app: AppHandle) -> Result<Value, String> {
+    match app.dialog().file().blocking_pick_file() {
+        Some(p) => {
+            let path = p.into_path().map_err(|e| e.to_string())?;
+            let bytes = read_file_robust(&path)?;
+            let mut v = file_info(&path);
+            v["data"] = json!(B64.encode(bytes));
+            v["cancelled"] = json!(false);
+            Ok(v)
+        }
+        None => Ok(json!({ "cancelled": true })),
+    }
+}
+
+#[tauri::command]
+fn lf_read(path: String) -> Result<Value, String> {
+    if !link_ext_ok(&path) {
+        return Err("Неподдържан тип файл".into());
+    }
+    let p = std::path::Path::new(&path);
+    let bytes = read_file_robust(p)?;
+    let mut v = file_info(p);
+    v["data"] = json!(B64.encode(bytes));
+    Ok(v)
+}
+
+#[tauri::command]
+fn lf_write(path: String, data: String, b64: Option<bool>) -> Result<Value, String> {
+    if !link_ext_ok(&path) {
+        return Err("Неподдържан тип файл".into());
+    }
+    let p = std::path::Path::new(&path);
+    let bytes = if b64.unwrap_or(false) {
+        B64.decode(data.as_bytes()).map_err(|e| e.to_string())?   /* двоични файлове (.docx, .odt) идват като base64 */
+    } else {
+        data.into_bytes()
+    };
+    std::fs::write(p, bytes).map_err(|e| format!("Не мога да запиша „{}“: {}", p.display(), e))?;
+    Ok(file_info(p))
+}
+
+#[tauri::command]
+fn lf_stat(path: String) -> Result<Value, String> {
+    if !link_ext_ok(&path) {
+        return Err("Неподдържан тип файл".into());
+    }
+    let p = std::path::Path::new(&path);
+    if !p.exists() {
+        return Err("Файлът не е намерен".into());
+    }
+    Ok(file_info(p))
 }
 
 #[tauri::command]
@@ -273,6 +404,19 @@ async fn monitor_count(app: AppHandle) -> usize {
         .map(|m| m.len())
         .unwrap_or(1)
         .max(1)
+}
+
+/// Прозорците се създават скрити, а страницата ги показва, след като им върне размера и мястото.
+/// Ако страницата не го направи (грешка, бавно зареждане), прозорецът се показва сам след 4 секунди.
+fn show_later(app: AppHandle, label: &'static str) {
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_secs(4));
+        if let Some(w) = app.get_webview_window(label) {
+            if !w.is_visible().unwrap_or(true) {
+                let _ = w.show();
+            }
+        }
+    });
 }
 
 #[tauri::command]
@@ -293,6 +437,7 @@ async fn open_reader(app: AppHandle) -> Result<(), String> {
     let w = WebviewWindowBuilder::new(&app, "reader", WebviewUrl::App("index.html#view".into()))
         .title("TPrompt")
         .inner_size(1280.0, 720.0)
+        .visible(false)
         .initialization_script("window.__TP_VIEWER = true;")
         .build()
         .map_err(|e| e.to_string())?;
@@ -300,6 +445,7 @@ async fn open_reader(app: AppHandle) -> Result<(), String> {
         let _ = w.set_position(PhysicalPosition::new(m.position().x, m.position().y));
         let _ = w.set_fullscreen(true);
     }
+    show_later(app.clone(), "reader");
     Ok(())
 }
 
@@ -449,6 +595,10 @@ pub fn run() {
         .manage(Remote::default())
         .invoke_handler(tauri::generate_handler![
             save_file,
+            lf_pick,
+            lf_read,
+            lf_write,
+            lf_stat,
             monitor_count,
             open_reader,
             close_reader,
@@ -478,6 +628,7 @@ pub fn run() {
                     let _ = w.minimize();
                 }
             }
+            show_later(app.handle().clone(), "main");
             Ok(())
         })
         .run(tauri::generate_context!())

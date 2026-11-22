@@ -1,6 +1,6 @@
 [package]
 name = "tprompt"
-version = "1.2.0"
+version = "1.4.0"
 description = "TPrompt - телепромптър"
 authors = ["TPrompt"]
 edition = "2021"
@@ -19,6 +19,11 @@ tauri-plugin-autostart = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tiny_http = "0.12"
+base64 = "0.22"
+
+# четене на кръстачката на Bluetooth дистанционни (Raw Input, страница Consumer)
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = ["Win32_Foundation", "Win32_UI_Input", "Win32_UI_WindowsAndMessaging", "Win32_Devices_HumanInterfaceDevice", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_Graphics_Gdi"] }
 
 [profile.release]
 panic = "abort"
