@@ -10,6 +10,83 @@
 <!-- ==================== КРАЙ: Начално зареждане ==================== -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- ==================== TEST-ONLY:BEGIN (тестов превключвател Windows/Android; маха се от zip файла за издаване) ==================== -->
+<style>
+#tpTestSw{position:fixed;left:6px;bottom:6px;z-index:2147483647;font:600 12px/1.2 system-ui,sans-serif;background:#c2185b;color:#fff;border:0;border-radius:6px;padding:5px 6px;opacity:.85;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+html.tptest .rm-qrwrap{position:relative}
+html.tptest .rm-qrwrap::after{content:"QR код (тест)";position:absolute;left:50%;top:50%;width:var(--net-sq);height:var(--net-sq);transform:translate(-50%,-50%);box-sizing:border-box;display:flex;align-items:center;justify-content:center;text-align:center;background:repeating-linear-gradient(45deg,#2a2c31 0 10px,#33363c 10px 20px);color:#ddd;font:700 13px system-ui,sans-serif;border-radius:4px}
+html.tptest #netCliCam video{display:none}
+html.tptest #netCliCam::before{content:"Камера / скенер за QR (тест)";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;background:repeating-linear-gradient(45deg,#1d1f23 0 10px,#26282d 10px 20px);color:#ddd;font:700 13px system-ui,sans-serif}
+</style>
+<script>(function(){
+  var M='';try{M=localStorage.getItem('tp.testPlat')||''}catch(e){}
+  window.__TP_TEST=M;
+  if(M==='win'||M==='android'){
+    document.documentElement.classList.add('tptest');
+    var tok='TEST'+Math.random().toString(36).slice(2,6).toUpperCase(),rw=null;
+    var info=function(){return {token:tok,url:'http://192.168.1.10:8080/?k='+tok}};
+    var C={
+      remote_start:function(){return info()},remote_new_token:function(){tok='TEST'+Math.random().toString(36).slice(2,6).toUpperCase();return info()},
+      remote_stop:function(){return null},remote_set_content:function(){return null},remote_want:function(){return null},
+      remote_sync:function(){return M==='android'?{v:[]}:[]},rx_pump:function(){return {rxAgo:null,webAgo:null,msgs:[]}},
+      tx_clear:function(){return null},tx_push:function(){return null},
+      monitor_count:function(){return 1},autostart_get:function(){return false},autostart_set:function(){return null},
+      open_reader:function(){if(!rw||rw.closed)rw=window.open(location.href.split('#')[0]+'#view','tprompt_view','popup=yes,width=1280,height=720');else rw.focus();return null},
+      close_reader:function(){if(rw&&!rw.closed)rw.close();return null},reader_open:function(){return !!(rw&&!rw.closed)}
+    };
+    var call=function(c,a){return new Promise(function(res,rej){if(C[c])res(C[c](a||{}));else rej(new Error('Не е налично в тестовия режим: '+c))})};
+    if(M==='win'){
+      window.__TAURI_INTERNALS__={invoke:call};
+      if(Math.min(screen.width,screen.height)<900){var vm=document.querySelector('meta[name=viewport]');if(vm)vm.setAttribute('content','width=1280, viewport-fit=cover')}   /* на телефон: изгледът за компютър, смален */
+    }else{
+      try{Object.defineProperty(navigator,'userAgent',{get:function(){return 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36'}})}catch(e){}
+      var P={};Object.keys(C).forEach(function(k){P[k]=function(a){return call(k,a)}});
+      window.Capacitor={getPlatform:function(){return 'android'},isNativePlatform:function(){return true},Plugins:{TPServer:P,
+        FileSaver:{save:function(o){try{var b=o.b64?Uint8Array.from(atob(o.data),function(c){return c.charCodeAt(0)}):o.data;var u=URL.createObjectURL(new Blob([b],{type:o.mime||'application/octet-stream'}));var a=document.createElement('a');a.href=u;a.download=o.name||'file';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000)}catch(e){return Promise.reject(e)}return Promise.resolve({})}}}};
+    }
+    /* Android на широк екран (компютър): страницата се свива до екран на телефон (412×915), за да се вижда интерфейсът за телефон.
+       Размерът, проверките на екрана (@media, matchMedia) и докосването се подменят; на истински телефон нищо от това не се прави. */
+    if(M==='android'&&Math.min(screen.width,screen.height)>=600){
+      var FW=412,FH=915,RW=window.innerWidth,RH=window.innerHeight;
+      try{['innerWidth','outerWidth'].forEach(function(k){Object.defineProperty(window,k,{get:function(){return FW},configurable:true})});
+          ['innerHeight','outerHeight'].forEach(function(k){Object.defineProperty(window,k,{get:function(){return FH},configurable:true})});
+          ['width','availWidth'].forEach(function(k){Object.defineProperty(screen,k,{get:function(){return FW},configurable:true})});
+          ['height','availHeight'].forEach(function(k){Object.defineProperty(screen,k,{get:function(){return FH},configurable:true})});
+          Object.defineProperty(navigator,'maxTouchPoints',{get:function(){return 5},configurable:true});
+          window.ontouchstart=null;}catch(e){}
+      var realMM=window.matchMedia.bind(window);
+      var feat=function(f){f=f.trim().replace(/^\(|\)$/g,'').trim();var m=f.match(/^(min|max)-(width|height)\s*:\s*([\d.]+)px$/);
+        if(m){var v=m[2]==='width'?FW:FH,n=+m[3];return m[1]==='min'?v>=n:v<=n}
+        if(/^orientation\s*:\s*portrait$/.test(f))return FH>=FW;if(/^orientation\s*:\s*landscape$/.test(f))return FW>FH;
+        if(/^hover\s*:\s*none$/.test(f))return true;if(/^hover\s*:\s*hover$/.test(f))return false;
+        if(/^pointer\s*:\s*coarse$/.test(f))return true;if(/^pointer\s*:\s*fine$/.test(f))return false;
+        if(/^any-pointer\s*:\s*coarse$/.test(f))return true;if(/^any-hover\s*:\s*hover$/.test(f))return false;
+        return realMM('('+f+')').matches};
+      var evalMQ=function(q){return String(q).split(',').some(function(part){part=part.trim();var neg=/^not\s+/.test(part);part=part.replace(/^not\s+/,'').replace(/^(only\s+)?(all|screen)\s*(and\s*)?/,'');
+        var ok=part===''||part.split(/\s+and\s+/).every(feat);return neg?!ok:ok})};
+      window.matchMedia=function(q){return {matches:evalMQ(q),media:q,addEventListener:function(){},removeEventListener:function(){},addListener:function(){},removeListener:function(){},onchange:null}};
+      window.__TP_FEAT_ACTIVE=true;   /* блокът за мащаба смята @media и при 100% */
+      var fixCss=function(){if(window.__tpApplyMQ)return window.__tpApplyMQ();[].forEach.call(document.styleSheets,function(sh){var rs;try{rs=sh.cssRules}catch(e){return}
+        (function walk(list){[].forEach.call(list,function(r){if(r.media&&r.type===4){var t=r.media.mediaText;if(!r.__tpQ)r.__tpQ=t;var on=evalMQ(r.__tpQ);
+          try{r.media.mediaText=on?'all':'not all'}catch(e){}}if(r.cssRules)walk(r.cssRules)})})(rs)})};
+      var k=Math.min(1,(RH-16)/FH,(RW-16)/FW);
+      var st=document.createElement('style');
+      st.textContent='html.tpfr{background:#3a3d44;height:100%;overflow:hidden}html.tpfr body{position:absolute!important;left:50%;top:8px;width:calc('+FW+'px / var(--ui,1))!important;height:calc('+FH+'px / var(--ui,1))!important;min-height:0!important;margin:0!important;overflow:hidden!important;transform:translateX(-50%) scale('+k+');/* рамката остава с размер на телефон и при мащаб на интерфейса: мащабът (zoom) се компенсира в ширината и височината */transform-origin:top center;outline:1px solid #000;box-shadow:0 0 0 8px #1b1c1f}';
+      document.head.appendChild(st);document.documentElement.classList.add('tpfr');
+      document.addEventListener('DOMContentLoaded',fixCss);addEventListener('load',fixCss);
+    }
+    /* скенерът: вместо камера се показва заместител */
+    document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('#netCliScan');if(!b)return;e.stopImmediatePropagation();e.preventDefault();var c=document.getElementById('netCliCam');if(c)c.hidden=false},true);
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    if(location.hash==='#view')return;
+    var s=document.createElement('select');s.id='tpTestSw';s.title='Тестов режим (не е част от програмата)';
+    [['','ТЕСТ: Браузър'],['win','ТЕСТ: Windows'],['android','ТЕСТ: Android']].forEach(function(o){var x=document.createElement('option');x.value=o[0];x.textContent=o[1];if(o[0]===M)x.selected=true;s.appendChild(x)});
+    s.addEventListener('change',function(){try{if(s.value)localStorage.setItem('tp.testPlat',s.value);else localStorage.removeItem('tp.testPlat')}catch(e){}location.reload()});
+    document.body.appendChild(s);
+  });
+})();</script>
+<!-- ==================== TEST-ONLY:END ==================== -->
 <meta name="theme-color" content="#111214">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -74,10 +151,8 @@
    ЕДИННА ДИЗАЙН СИСТЕМА (токени). Всички размери, отстояния, радиуси, сенки и цветове
    на интерфейса се вземат оттук; суровите стойности в правилата са заменени с тези променливи.
    ===================================================================== */
-:root{--sp-0:2px;--sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:24px;--r-xs:2.8px;--r-sm:4.2px;--r:7px;--r-lg:9.8px;--ctl-sm:28px;--ctl:34px;--ctl-lg:44px;--ctl-xl:52px;--row-opt:52px;--fs-xs:11px;--fs-sm:12px;--fs:13px;--fs-md:14px;--fs-lg:15px;--fs-xl:17px;--t:.15s;--t-slow:.25s;--dis:.4;--danger:#dd323a;--danger-ink:#ff5d66;--float-bg:rgba(18,19,22,.82);--float-line:rgba(255,255,255,.14);--float-ink:#ececf0;--float-press:rgba(255,255,255,.14);--sh-float:0 10px 30px -10px rgba(0,0,0,.6);--sh-modal:0 30px 80px -20px rgba(0,0,0,.7);--ring:0 0 0 3px color-mix(in srgb,var(--acc) 35%,transparent)}
-@media (max-width:640px){
-  :root{--ctl:44px}
-}
+:root{--sp-0:2px;--sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:24px;--r-xs:2.8px;--r-sm:4.2px;--r:7px;--r-lg:9.8px;--ctl-sm:28px;--ctl:34px;--ctl-lg:44px;--ctl-xl:52px;--row-opt:var(--ctl);--fs-xs:11px;--fs-sm:12px;--fs:13px;--fs-md:14px;--fs-lg:15px;--fs-xl:17px;--t:.15s;--t-slow:.25s;--dis:.4;--danger:#dd323a;--danger-ink:#ff5d66;--float-bg:rgba(18,19,22,.82);--float-line:rgba(255,255,255,.14);--float-ink:#ececf0;--float-press:rgba(255,255,255,.14);--sh-float:0 10px 30px -10px rgba(0,0,0,.6);--sh-modal:0 30px 80px -20px rgba(0,0,0,.7);--ring:0 0 0 3px color-mix(in srgb,var(--acc) 35%,transparent)}
+
 :root[data-theme="light"]{--bg:#eceefb;--panel:#ffffff;--panel2:#f1f2fd;--line:#e0e4f7;--ink:#161a3a;--mute:#5b629a;--hover:#e1e4fa;color-scheme:light}
 :root[data-theme="dark"]{--bg:#111214;--panel:#1a1b1e;--panel2:#232529;--line:#2f3137;--ink:#ececf0;--mute:#9b9da7;--hover:#2d2f35;color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%;overflow:clip}
@@ -1119,7 +1194,7 @@ body.hide-bm #bmRSide,body.hide-sc #bmSide,.bmowner[hidden]{display:none}
 .pal .sw button:active,.presets button:active{filter:brightness(.85)}
 .toggles .btn[aria-pressed="true"]{background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--ink)}
 .toggles .btn[aria-pressed="true"]:hover{background:color-mix(in srgb,var(--acc) 22%,transparent);box-shadow:none}
-#settings .net-role-seg .btn[aria-selected="true"] i,#settings .net-role-seg .btn.on i,#netHostSec #netHostOff,#netHostSec h3 i,#netCliSec h3 i,.toggles .btn[aria-pressed="true"] i{color:var(--acc)}
+#settings .net-role-seg .btn[aria-selected="true"] i,#settings .net-role-seg .btn.on i,#netHostSec h3 i,#netCliSec h3 i,.toggles .btn[aria-pressed="true"] i{color:var(--acc)}
 .seg button[aria-pressed="true"],.ib.on,.bmi .ib.on,.bmi.editing .act.e{background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
 .seg button[aria-pressed="true"]{color:var(--ink)}
 .seg button[aria-pressed="true"]:hover,.ib.on:hover,.bmi .ib.on:hover,.bmi.editing .act.e:hover{background:color-mix(in srgb,var(--acc) 22%,transparent);box-shadow:inset 0 0 0 1px var(--acc)}
@@ -1377,7 +1452,6 @@ header.top .btn{height:52px;flex-direction:column;justify-content:center;gap:var
 #settings #setBody :is(.row,.h3row)>.sub{text-align:right}
 #settings #setBody .step{display:flex;justify-content:space-between}
 #settings #setBody .step input{flex:1 1 auto;width:auto;min-width:0;text-align:center}
-#settings #setBody  .ui-colors .cbtn{order:-1;flex:none}
 #settings #setBody .presets-row{grid-template-columns:minmax(0,1fr)}
 #settings #setBody .presets-row>*{grid-column:1/-1}
 #settings #setBody .presets-row>span.l{padding-top:0}
@@ -1404,7 +1478,47 @@ header.top .btn{height:52px;flex-direction:column;justify-content:center;gap:var
 #settings #netCliBody :is(#netCliCam,.net-cli-ph-cam){margin:auto}
 @container (max-width:400px){   /* телефон: в 1/3 контролите (−/стойност/+, по-дълги надписи) не се побират, затова колоната за контроли е 1/2 */
   #settings #setBody :is(.row,.h3row),#settings #setBody[data-tab="read"]>section:has(>.toggles){grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}/* Без групиране: между групите (секциите) е същото разстояние като между редовете – 8 (освен „Връзка“, която има собствена подредба) */
+#settings #setBody:not([data-tab="conn"]){display:flex;flex-direction:column;gap:var(--sp-2);padding-top:var(--sp-2)}
+#settings #setBody:not([data-tab="conn"])>section{flex:none;padding-top:0;padding-bottom:0}
+
+/* ==================== Мащаб на интерфейса (Настройки → Общи; логиката е в js/03a-ui-scale.js) ====================
+   --ui е коефициентът (1 = 100%). Мащабира се целият интерфейс; текстът за четене (#stage) запазва собствения си размер.
+   Размерите спрямо прозореца (vw, vh) се делят на --ui, защото мащабирането иначе ги увеличава заедно с всичко останало. */
+body{zoom:var(--ui,1)}
+#stage{zoom:calc(1 / var(--ui,1))}
+.pal{max-height:calc((100vh - 16px) / var(--ui,1))}
+#clBadge{max-width:calc((100vw - 28px) / var(--ui,1))}
+#remBar{max-width:min(560px,calc((100vw - 20px) / var(--ui,1)))}
+#bmPanel{width:min(340px,calc(88vw / var(--ui,1)))}
+#toast{max-width:min(560px,calc(92vw / var(--ui,1)))}
+@media (max-width:640px){
+  #settings .net-role-seg .btn{width:calc((100vw / var(--ui,1) - 2 * var(--sp-3) - 4 * var(--sp-1)) / 5)}
 }
+@media (max-width:900px){
+  #bmSide,#bmRSide{width:min(340px,calc(90vw / var(--ui,1)))}
+}
+
+/* ==================== Закачане на панелите (само Windows, широк прозорец; логиката е в js/22a-dock.js) ==================== */
+body:not(.dock) #dockSplit{display:none!important}
+body.dock .work{display:grid;grid-template-columns:var(--dkL,0px) var(--dkGL,0px) minmax(0,1fr) var(--dkGR,0px) var(--dkR,0px);grid-template-rows:minmax(0,var(--dkA,1fr)) var(--dkS,0px) minmax(0,var(--dkB,0fr))}
+body.dock .work>.stagewrap{grid-column:3;grid-row:1 / -1;min-width:0}
+body.dock :is(#bmSide,#bmRSide){width:auto!important;min-width:0;min-height:0;border:0}
+body.dock #bmGrip{grid-column:2;grid-row:1 / -1;width:7px;margin:0 -3px}
+body.dock #bmGripR{grid-column:4;grid-row:1 / -1;width:7px;margin:0 -3px}
+body.dock :is(#bmGrip,#bmGripR).dk-off{pointer-events:none;cursor:default;background-size:1px 100%}
+body.dock #dockSplit{display:block;grid-row:2;height:7px;margin:-3px 0;z-index:3;cursor:ns-resize;touch-action:none;background:linear-gradient(90deg,color-mix(in srgb,var(--acc) 60%,transparent),color-mix(in srgb,var(--acc) 60%,transparent)) center/100% 0 no-repeat}
+body.dock #dockSplit:hover{background-size:100% 1px}
+body.dock #dockSplit.drag{background-size:100% 2px}
+body.dock #dockSplit[hidden]{display:none}
+body.dock .bmside-h h3 i{cursor:move;touch-action:none}   /* панелът се мести, като се хване иконата му */
+/* влачене: контур след курсора и места за пускане */
+.dk-ghost{position:fixed;z-index:200;pointer-events:none;border:1px solid var(--acc);border-radius:var(--r);background:color-mix(in srgb,var(--panel) 80%,transparent);padding:var(--sp-2) var(--sp-3);opacity:.9}
+.dk-ghost h3{margin:0;display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-lg)}
+.dk-zone{position:fixed;z-index:199;pointer-events:none;border:1px dashed color-mix(in srgb,var(--acc) 60%,transparent);border-radius:var(--r);background:color-mix(in srgb,var(--acc) 8%,transparent)}
+.dk-zone.hot{border-style:solid;border-color:var(--acc);background:color-mix(in srgb,var(--acc) 26%,transparent)}
+body.dk-dragging,body.dk-dragging *{cursor:move!important;user-select:none}
+
 </style>
 <!-- ==================== КРАЙ: Стилове (външен вид) ==================== -->
 </head>
@@ -1518,6 +1632,7 @@ header.top .btn{height:52px;flex-direction:column;justify-content:center;gap:var
       <div class="foot" id="foot"></div>
     </section>
 
+    <div id="dockSplit" title="Drag to change the height of the panels" hidden></div>
     <div id="bmGripR" title="Drag to resize the panel"></div>
     <aside id="bmRSide" aria-label="Bookmarks">
       <div class="bmsec">
@@ -1546,7 +1661,7 @@ header.top .btn{height:52px;flex-direction:column;justify-content:center;gap:var
     <div class="modal-body set-body" id="setBody" data-tab="read">
 
       <section data-cat="text" id="readGlobSec">
-        <span class="net-role-lbl">Global text settings</span>
+        <span class="net-role-lbl">Reading text settings</span>
       </section>
 
       <section data-cat="read" class="nb">
@@ -1618,7 +1733,9 @@ header.top .btn{height:52px;flex-direction:column;justify-content:center;gap:var
 
       <section data-cat="gen">
         <div class="h3row"><h3><i data-ic="palette"></i>Theme</h3><select id="themeSel" aria-label="Theme"><option value="light">Light</option><option value="dark">Dark</option></select></div>
-        <div class="ui-colors ggrp"><label title="Accent color">Accent<input type="color" id="cAcc"></label><label title="Interface background">Background<input type="color" id="cUiBg"></label><button class="btn" id="uiReset" type="button" title="Colors apply to the interface, not to the teleprompter text. Changing the theme resets them.">Reset colors</button></div>
+        <div class="row"><label title="Accent color">Accent</label><input type="color" id="cAcc"></div>
+        <div class="row"><label title="Interface background">Background</label><input type="color" id="cUiBg"></div>
+        <div class="row"><span></span><button class="btn" id="uiReset" type="button" title="Colors apply to the interface, not to the teleprompter text. Changing the theme resets them.">Reset colors</button></div>
       </section>
 
       <section data-cat="gen">
@@ -1711,11 +1828,23 @@ header.top .btn{height:52px;flex-direction:column;justify-content:center;gap:var
       </section>
 
       <section data-cat="gen" id="lfPollSec">
-        <div class="h3row"><h3><i data-ic="refresh"></i>Sync linked file</h3><label class="sw2" title="Syncs changes in the linked file from a local or network drive."><input type="checkbox" data-key="lfPoll" aria-label="Sync linked file"><span class="tr"></span></label></div>
+        <div class="h3row"><h3><i data-ic="link"></i>Sync linked file</h3><label class="sw2" title="Syncs changes in the linked file from a local or network drive."><input type="checkbox" data-key="lfPoll" aria-label="Sync linked file"><span class="tr"></span></label></div>
       </section>
 
       <section data-cat="gen" id="autoSec" hidden>
         <div class="h3row"><h3><i data-ic="monitor"></i>Start with Windows</h3><label class="sw2" title="Start TPrompt minimized when you sign in to Windows"><input type="checkbox" id="autoTgl" aria-label="Start with Windows"><span class="tr"></span></label></div>
+      </section>
+
+      <section data-cat="gen">
+        <div class="h3row"><h3><i data-ic="max"></i>Interface scale</h3><div class="step" title="Interface scale"><button class="ib" data-bump="uiScale" data-d="-10" title="Smaller"><i data-ic="minus"></i></button><input type="number" id="uiScaleN" data-key="uiScale" min="50" max="200" step="10" aria-label="Interface scale (%)"><button class="ib" data-bump="uiScale" data-d="10" title="Larger"><i data-ic="plus"></i></button></div></div>
+      </section>
+
+      <section data-cat="gen" id="dockSec" hidden>
+        <div class="h3row"><h3><i data-ic="wins"></i>Dockable windows</h3><label class="sw2" title="Library and Bookmarks can be moved to the left or right side by dragging their icon"><input type="checkbox" data-key="dock" aria-label="Dockable windows"><span class="tr"></span></label></div>
+      </section>
+
+      <section data-cat="gen">
+        <div class="row"><span></span><button class="btn" id="uiResetLayout" type="button" title="Returns the panel layout and the interface scale to the default">Reset UI</button></div>
       </section>
 
       <section data-cat="gen">
@@ -2481,7 +2610,7 @@ $$('[data-ic]').forEach(e=>e.innerHTML=svg(e.dataset.ic));
 
 /* ---------- Настройки ---------- */
 const FONTS=[['Open Sans','sans-serif'],['Roboto','sans-serif'],['PT Sans','sans-serif'],['Manrope','sans-serif'],['Arial','sans-serif'],['Verdana','sans-serif'],['Tahoma','sans-serif'],['PT Serif','serif'],['Georgia','serif'],['Times New Roman','serif'],['Courier New','monospace']];
-const DEF={speed:15,fs:64,lh:1.35,pgap:0.6,width:82,font:'Open Sans',color:'#ffffff',bg:'#000000',mirrorH:false,mirrorV:false,marker:false,markerY:42,markerH:140,markerColor:'#ffb547',noteColor:'#4dd6ff',dim:55,invert:false,clicker:true,progress:true,theme:'dark',accent:'',uiBg:'',lang:'en',spell:true,startMode:'ask',lfPoll:false,txtEnc:'windows-1251'};
+const DEF={uiScale:100,dock:false,speed:15,fs:64,lh:1.35,pgap:0.6,width:82,font:'Open Sans',color:'#ffffff',bg:'#000000',mirrorH:false,mirrorV:false,marker:false,markerY:42,markerH:140,markerColor:'#ffb547',noteColor:'#4dd6ff',dim:55,invert:false,clicker:true,progress:true,theme:'dark',accent:'',uiBg:'',lang:'en',spell:true,startMode:'ask',lfPoll:false,txtEnc:'windows-1251'};
 /* .docx библиотеката се зарежда само при нужда: първо локално (vendor/), после от мрежата. Така не блокира стартирането. */
 let mammothP=null;
 function loadMammoth(){
@@ -2493,7 +2622,7 @@ function loadMammoth(){
 }
 const hexRGB=h=>{h=(h||'#000').replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16)||0;return[(n>>16)&255,(n>>8)&255,n&255]};
 const okHex=h=>/^#[0-9a-f]{6}$/i.test(h||'');
-const LIM={speed:[1,100],fs:[20,240],lh:[1,2.4],pgap:[0,1.5],width:[30,100],markerY:[10,90],markerH:[40,800],dim:[0,90]};
+const LIM={uiScale:[50,200],speed:[1,100],fs:[20,240],lh:[1,2.4],pgap:[0,1.5],width:[30,100],markerY:[10,90],markerH:[40,800],dim:[0,90]};
 const PRESETS=[['#ffffff','#000000','Classic'],['#ffe66d','#000000','Yellow on black'],['#111111','#f4f0e4','Paper'],['#ffffff','#0b1b45','Night blue'],['#7dffb2','#04140c','Green'],['#ffd9a8','#1a1209','Warm']];
 let S={...DEF};S.lang=/^bg/i.test(navigator.language||'')?'bg':'en';if(innerWidth<640){S.fs=40;S.width=92}
 try{const j=JSON.parse(localStorage.getItem('tp.settings.v1')||'null');if(j&&typeof j==='object')for(const k in DEF)if(k in j&&typeof j[k]===typeof DEF[k])S[k]=j[k]}catch(e){oops('okHex#1',e)}
@@ -2602,6 +2731,39 @@ const fontKind=n=>{const f=FONTS.find(x=>x[0]===n);if(f)return f[1];const l=n.to
 /* шрифтът от документа, а ако го няма на устройството - вграденият Open Sans и общо семейство */
 const fam=n=>{const k=fontKind(n);return FONTS.some(x=>x[0]===n)?`"${n}", ${k}`:`"${n}", "${k==='serif'?'PT Serif':'Open Sans'}", ${k}`};
 
+/* ==================== НАЧАЛО: Мащаб на интерфейса (Настройки → Общи → „Мащаб на интерфейса“) ====================
+   S.uiScale е в проценти (100 = обичайният размер) и е отделен за всяко устройство (не се пренася към свързаното).
+   Мащабът се прилага на целия интерфейс (стилът е в css/14-ui-scale.css); текстът за четене запазва собствения си размер.
+   Мащабирането не променя проверките на браузъра за ширина на прозореца, затова тук те се смятат спрямо мащабираната ширина:
+   правилата @media в стиловете (uiApplyMQ) и проверките в кода (uiMQ, uiVW, uiVH). При 100% нищо не се подменя. */
+function uiK(){const v=+(S&&S.uiScale)||100;return Math.min(2,Math.max(.5,v/100))}
+function uiVW(){return innerWidth/uiK()}
+function uiVH(){return innerHeight/uiK()}
+var uiRealMM=window.matchMedia.bind(window),uiMQL=[];
+function uiFeat(f){f=f.trim().replace(/^\(|\)$/g,'').trim();const m=f.match(/^(min|max)-(width|height)\s*:\s*([\d.]+)px$/);
+  if(m){const v=m[2]==='width'?uiVW():uiVH(),n=+m[3];return m[1]==='min'?v>=n:v<=n}
+  return uiRealMM('('+f+')').matches}
+function uiEvalQ(q){return String(q).split(',').some(part=>{part=part.trim();const neg=/^not\s+/.test(part);part=part.replace(/^not\s+/,'');
+  if(/^(only\s+)?print\b/.test(part))return neg;
+  part=part.replace(/^(only\s+)?(all|screen)\s*(and\s*)?/,'');const ok=part===''||part.split(/\s+and\s+/).every(uiFeat);return neg?!ok:ok})}
+function uiMQ(q){return {media:q,get matches(){return uiEvalQ(q)},
+  addEventListener(ev,fn){if(ev==='change')uiMQL.push({q,fn,last:uiEvalQ(q)})},removeEventListener(){},addListener(fn){this.addEventListener('change',fn)},removeListener(){}}}
+function uiApplyMQ(){
+  const raw=uiK()===1&&!window.__TP_FEAT_ACTIVE;
+  [].forEach.call(document.styleSheets,sh=>{let rs;try{rs=sh.cssRules}catch(e){return}
+    (function walk(list){[].forEach.call(list,r=>{
+      if(r.type===4&&r.media){if(r.__q0===undefined)r.__q0=r.__tpQ!==undefined?r.__tpQ:r.media.mediaText;
+        const want=raw?r.__q0:(uiEvalQ(r.__q0)?'all':'not all');if(r.media.mediaText!==want)try{r.media.mediaText=want}catch(e){oops('uiApplyMQ#1',e)}}
+      if(r.cssRules)walk(r.cssRules)})})(rs)});
+  for(const l of uiMQL){const v=uiEvalQ(l.q);if(v!==l.last){l.last=v;try{l.fn({matches:v,media:l.q})}catch(e){oops('uiMQ#1',e)}}}
+}
+window.__tpApplyMQ=uiApplyMQ;
+let uiLastK=null;
+function uiApply(){const k=uiK();if(k===uiLastK&&!window.__TP_FEAT_ACTIVE)return;uiLastK=k;document.documentElement.style.setProperty('--ui',k);uiApplyMQ()}
+uiApply();
+addEventListener('resize',()=>{if(uiK()!==1||window.__TP_FEAT_ACTIVE)uiApplyMQ()});
+/* ==================== КРАЙ: Мащаб на интерфейса ==================== */
+
 /* ---------- Елементи ---------- */
 const editorWrap=$('#editor'), tt=TPEd.create(editorWrap), editor=tt.view.dom, prompter=$('#prompter'), stage=$('#stage'), viewport=$('#viewport'), scroller=$('#scroller'), textcol=$('#textcol'), hud=$('#hud'), settings=$('#settings');
 let reading=false, playing=false, pos=0, maxPos=0, raf=0, lastT=0, lastTickAt=0, hudTimer=0, dragMoved=false, remain=0;
@@ -2612,6 +2774,10 @@ function toast(msg,err){const t=$('#toast');t.textContent=msg;t.classList.toggle
 
 /* ==================== НАЧАЛО: Преводи на български (ключът е английският текст, основният език на програмата) ==================== */
 const BG={
+'Reset UI':'Нулирай интерфейса','Returns the panel layout and the interface scale to the default':'Връща подредбата на панелите и мащаба на интерфейса към началните',
+'Dockable windows':'Закачане на прозорците','Library and Bookmarks can be moved to the left or right side by dragging their icon':'Библиотеката и Отметките могат да се преместват вляво или вдясно, като се влачи иконата им',
+'Drag to move the panel':'Плъзнете, за да преместите панела','Drag to change the height of the panels':'Плъзнете, за да промените височината на панелите',
+'Interface scale':'Мащаб на интерфейса','Interface scale (%)':'Мащаб на интерфейса (%)','Smaller':'По-малко','Larger':'По-голямо',
 'Teleprompter text':'Текст за телепромптъра',
 'This device cannot be a Monitor.':'Това устройство не може да бъде Монитор.',
 'Size of the selected text (pt): choose from the list or type a value':'Размер на маркирания текст (пт): изберете от списъка или въведете стойност',
@@ -2628,7 +2794,7 @@ const BG={
 'Connection settings':'Настройки за свързване',
 'No address entered.':'Няма въведен адрес.',
 'Preferences':'Предпочитания',
-'Global text settings':'Глобални настройки на текста',
+'Reading text settings':'Настройки на текста за четене',
 'Reading settings':'Настройки за четене',
 'Disconnect':'Прекъсни',
 'Use this device as':'Използвай това устройство като',
@@ -3045,6 +3211,7 @@ function applyLang(){
 
 /* ---------- Прилагане на стилове ---------- */
 function applyStyles(){
+  uiApply();
   const frac=reading&&maxPos>0?pos/maxPos:0;
   const r=document.documentElement.style;
   const P=S,fnt=fam(S.font);
@@ -3057,6 +3224,7 @@ function applyStyles(){
   editor.spellcheck=!!S.spell;
   hud.classList.toggle('noprog',!S.progress);$('#rBar2').classList.toggle('noprog',!S.progress);document.body.classList.toggle('noprog',!S.progress);
   applyTheme();
+  try{dockApply()}catch(e){oops('applyStyles#dock',e)}
   try{if(pvRendered)layoutPreview()}catch(e){oops('applyStyles#1',e)}
   if(reading){layout();pos=frac*maxPos;draw(true)}
 }
@@ -3751,7 +3919,7 @@ function openPal(anchor,cb,allowNone,cur,sel,live){
   paint(false,true);
   const r=anchor.getBoundingClientRect();pal.hidden=false;
   const ph=pal.offsetHeight,pw=pal.offsetWidth;
-  pal.style.top=(r.bottom+6+ph>innerHeight?Math.max(8,r.top-ph-6):r.bottom+6)+'px';pal.style.left=Math.max(8,Math.min(r.left,innerWidth-pw-8))+'px';
+  {const k=uiK();pal.style.top=(r.bottom+6+ph>innerHeight?Math.max(8,r.top-ph-6):r.bottom+6)/k+'px';pal.style.left=Math.max(8,Math.min(r.left,innerWidth-pw-8))/k+'px'}   /* в точки на интерфейса (мащаб) */
 }
 function closePal(){pal.hidden=true;palCb=null;palAnchor=null}
 /* бутоните за цвят и фон помнят последния избор: щракване върху бутона го прилага, а шевронът отваря останалите цветове */
@@ -5492,7 +5660,7 @@ function drawer(which){
 /* малък екран: бутоните Отметки, Редактор, Настройки избират кой панел е отворен */
 function syncPanelBtns(){
   try{
-    if(!matchMedia('(max-width:900px)').matches)return;
+    if(!uiMQ('(max-width:900px)').matches)return;
     const rc=rcOn(),e=rc?rcEff():(document.body.classList.contains('nt')?ntv:'ed');
     const on={sc:e==='sc',bm:e==='bm',set:e==='set',ed:e==='ed'};
     $$('[data-vt]').forEach(b=>{b.setAttribute('aria-pressed',String(on[b.dataset.vt]));b.disabled=false});
@@ -5500,7 +5668,7 @@ function syncPanelBtns(){
 }
 $('#scrim').addEventListener('click',()=>drawer(null));
 $('#bCloseBm').addEventListener('click',()=>drawer(null));
-window.addEventListener('resize',()=>{if(innerWidth>900&&!reading)drawer(null)});
+window.addEventListener('resize',()=>{if(uiVW()>900&&!reading)drawer(null)});
 $('#themeSel').addEventListener('change',e=>set('theme',e.target.value));
 $('#startSel').addEventListener('change',e=>{S.startMode=e.target.value;saveS();updateOpenLabel()});
 $('#cAcc').addEventListener('input',e=>set('accent',e.target.value));
@@ -6097,7 +6265,7 @@ const stM=$('#startModal');
 const closeRun=()=>{stM.hidden=true;pendBm=null};
 const MODES=['full','win'],MODE_BTN={full:'#bStart',win:'#bWin'};
 const MODE_T={full:'Full screen',win:'In a window'};
-const modeAvail=m=>m!=='win'||!(document.body.classList.contains('rc')||matchMedia('(max-width:640px)').matches);
+const modeAvail=m=>m!=='win'||!(document.body.classList.contains('rc')||uiMQ('(max-width:640px)').matches);
 function openStartDlg(note){
   const n=$('#stNote');n.hidden=!note;n.textContent=note||'';
   $('#stRemember').checked=false;
@@ -6333,7 +6501,7 @@ function clPaint(){
   clBadgeEl.innerHTML=`${svgI(ic)}<span class="l">${esc(t(lab))}</span><b>${esc(String(val))}</b><span class="dots">${av.map(x=>`<span class="${x===clMode?'on':''}"></span>`).join('')}</span>`;
   clBadgeEl.dataset.m=clMode;
   try{const pr=prompter.getBoundingClientRect(),hr=hud.getBoundingClientRect();
-    if(hr.height>0)clBadgeEl.style.bottom=Math.max(8,Math.round(pr.bottom-(hr.top-(hud.classList.contains('open')?0:10))+8))+'px'}catch(e){oops('clPaint#1',e)}
+    if(hr.height>0)clBadgeEl.style.bottom=Math.max(8,Math.round(pr.bottom-(hr.top-(hud.classList.contains('open')?0:10))+8))/uiK()+'px'}catch(e){oops('clPaint#1',e)}
 }
 /* значката се показва само при смяна на режима (clSwitch) */
 function clBadge(){
@@ -6946,7 +7114,7 @@ setInterval(()=>{if(VIEWER)return;if(popupWin&&popupWin.nowin&&!popupWin.pending
 if(IS_TAURI&&!VIEWER)setInterval(()=>{if(popupWin&&!popupWin.closed&&!popupWin.net)tinvoke('reader_open').then(o=>{if(!o&&popupWin)popupWin.closed=true}).catch(e=>{oops('updateRemote#1',e)})},700);
 function mergeSettings(src){
   const lg=S.lang;
-  for(const k in DEF)if(k!=='startMode'&&k in src&&typeof src[k]===typeof DEF[k])S[k]=src[k];
+  for(const k in DEF)if(k!=='startMode'&&k!=='uiScale'&&k in src&&typeof src[k]===typeof DEF[k])S[k]=src[k];
   fromRemote=true;try{saveS()}finally{fromRemote=false}
   applyStyles();syncUI();if(lg!==S.lang)applyLang();
 }
@@ -7059,17 +7227,18 @@ function initViewer(){
   const mk=(side,grip,vname,key,sign)=>{
     let w=250;
     try{w=parseInt(localStorage.getItem(key),10)||250}catch(e){oops('mk#1',e)}
-    const setW=x=>{w=Math.round(Math.min(Math.max(200,x),Math.min(700,innerWidth*.5)));document.documentElement.style.setProperty(vname,w+'px')};
+    const setW=x=>{w=Math.round(Math.min(Math.max(200,x),Math.min(700,uiVW()*.5)));document.documentElement.style.setProperty(vname,w+'px')};
     const save=()=>{try{localStorage.setItem(key,w)}catch(e){oops('save#1',e)}};
     setW(w);
     grip.addEventListener('pointerdown',e=>{
+      if(document.body.classList.contains('dock'))return;   /* при закачени панели ширината е на колоната (виж „Закачане на панелите“) */
       e.preventDefault();const x0=e.clientX,w0=side.getBoundingClientRect().width;
       grip.setPointerCapture(e.pointerId);grip.classList.add('drag');
       const mv=ev=>setW(w0+sign*(ev.clientX-x0));
       const up=()=>{grip.classList.remove('drag');grip.removeEventListener('pointermove',mv);grip.removeEventListener('pointerup',up);save()};
       grip.addEventListener('pointermove',mv);grip.addEventListener('pointerup',up);
     });
-    grip.addEventListener('dblclick',()=>{setW(250);save()});
+    grip.addEventListener('dblclick',()=>{if(document.body.classList.contains('dock'))return;setW(250);save()});
   };
   mk($('#bmSide'),$('#bmGrip'),'--bmw','tp.bmW',1);      /* текстове (вляво): влачене надясно = по-широк */
   mk($('#bmRSide'),$('#bmGripR'),'--bmrw','tp.bmrW',-1);   /* отметки (вдясно): влачене наляво = по-широк */
@@ -7089,7 +7258,7 @@ let VT={sc:true,bm:true,ed:true,set:true,ctl:true},autoEd=false;
 try{Object.assign(VT,JSON.parse(localStorage.getItem('tp.view')||'{}'))}catch(e){oops('up#3',e)}
 function applyView(){
   const on=remoteOn()&&!VIEWER,rc=document.body.classList.contains('rc'),eff=rc?rcEff()==='ed':(VT.ed||!on);
-  const wide=!rc&&!matchMedia('(max-width:900px)').matches;   /* скриването на секции важи само на компютър; на телефон панелът се избира с бутоните */
+  const wide=!rc&&!uiMQ('(max-width:900px)').matches;   /* скриването на секции важи само на компютър; на телефон панелът се избира с бутоните */
   document.body.classList.toggle('hide-bm',wide&&!VT.bm);
   document.body.classList.toggle('hide-sc',wide&&!VT.sc);
   document.body.classList.toggle('ctl-off',!VT.ctl);
@@ -7099,6 +7268,7 @@ function applyView(){
   {const vis=$('#bmRSide').offsetParent!==null;if(vis&&!bmWasVis)scrollBmActive();bmWasVis=vis}
   if(narrowMQ.matches)syncPanelBtns();
   else $$('[data-vt]').forEach(b=>{const k=b.dataset.vt;b.setAttribute('aria-pressed',String(k==='ed'?eff:VT[k]));if(k==='ed')b.disabled=!on&&!REMHOOK.can()});
+  try{dockApply()}catch(e){oops('applyView#dock',e)}
   if(pvRendered)layoutPreview();
 }
 function toggleVT(k){
@@ -7121,7 +7291,7 @@ $$('[data-vt]').forEach(b=>b.addEventListener('click',()=>{
   toggleVT(k);
 }));
 /* малък екран + свързано дистанционно: горе превю/редактор/отметки/настройки, долу контролите */
-const narrowMQ=matchMedia('(max-width:900px)');
+const narrowMQ=uiMQ('(max-width:900px)');
 /* rcv: какво е отворено в горната половина; „pv“ = само превюто и управлението (редакторът е затворен, както в Windows с втори прозорец) */
 let rcv='pv',ntv='ed',ntWas=false,rcWas=false,rcLiveWas=false,rcFull=false;
 /* дистанционно на цял екран: същият екран като „Цял екран“ (текст, панел за управление, отметки, настройки),
@@ -7414,6 +7584,108 @@ document.addEventListener('pointerdown',e=>{
 window.addEventListener('scroll',()=>{if(window.scrollX||window.scrollY)window.scrollTo(0,0)});
 applyStyles();syncUI();applyLang();sizeSel.value=18;fontSel.value=S.font;syncTools();
 if(VIEWER)initViewer();
+/* ==================== НАЧАЛО: Закачане на панелите (само програмата за Windows, широк прозорец) ====================
+   Библиотеката (sc) и Отметките (bm) се закачат в лява или дясна колона около редактора; двата могат да са в една колона един над друг.
+   Местене: влачене на иконата на панела (в заглавието) до светнало място. Ширина: ръбът между колоната и редактора. Височина при два в една колона: ръбът между тях.
+   Подредбата се пази в tp.dock. На Android и на тесен прозорец панелите са както преди. Стилът е в css/15-dock.css. */
+var DOCK=null;
+{
+  const D={sc:{side:'l'},bm:{side:'r'},top:'sc',wL:250,wR:250,split:.5};
+  try{D.wL=parseInt(localStorage.getItem('tp.bmW'),10)||250;D.wR=parseInt(localStorage.getItem('tp.bmrW'),10)||250}catch(e){oops('dock#1',e)}
+  try{const s=JSON.parse(localStorage.getItem('tp.dock')||'null');if(s&&typeof s==='object'){for(const k of ['sc','bm'])if(s[k])D[k].side=s[k].side==='r'?'r':'l';
+    if(s.top==='bm'||s.top==='sc')D.top=s.top;for(const k of ['wL','wR'])if(+s[k]>0)D[k]=+s[k];if(+s.split>0&&+s.split<1)D.split=+s.split}}catch(e){oops('dock#2',e)}
+  DOCK=D;
+}
+function dockSave(){try{localStorage.setItem('tp.dock',JSON.stringify(DOCK))}catch(e){oops('dockSave#1',e)}}
+function dockOn(){const b=document.body.classList;return IS_TAURI&&S.dock===true&&!VIEWER&&!b.contains('rc')&&!b.contains('nt')&&!uiMQ('(max-width:900px)').matches}
+const dkP={sc:$('#bmSide'),bm:$('#bmRSide')};
+const dkVis=k=>!document.body.classList.contains(k==='sc'?'hide-sc':'hide-bm');
+function dockCols(){const c={l:[],r:[]};for(const k of ['sc','bm'])if(dkVis(k))c[DOCK[k].side].push(k);
+  for(const s of ['l','r'])c[s].sort((a,b)=>(a===DOCK.top?0:1)-(b===DOCK.top?0:1));return c}
+function dockApply(){
+  if(!DOCK)return;
+  const on=dockOn(),rs=document.documentElement.style,sp=$('#dockSplit');
+  document.body.classList.toggle('dock',on);
+  for(const k in dkP){const h=dkP[k].querySelector('.bmside-h h3 i');if(on)h.title=t('Drag to move the panel');else h.removeAttribute('title')}
+  if(!on){for(const k in dkP){const p=dkP[k];p.style.gridColumn=p.style.gridRow='';p.classList.remove('dk-l','dk-r')}sp.hidden=true;return}
+  const c=dockCols(),open=s=>c[s].length>0;
+  const W=s=>!c[s].length?0:Math.round(Math.min(Math.max(200,s==='l'?DOCK.wL:DOCK.wR),Math.min(700,uiVW()*.5)));
+  rs.setProperty('--dkL',W('l')+'px');rs.setProperty('--dkR',W('r')+'px');
+  rs.setProperty('--dkGL',c.l.length?'1px':'0px');rs.setProperty('--dkGR',c.r.length?'1px':'0px');
+  $('#bmGrip').classList.toggle('dk-off',!open('l'));$('#bmGripR').classList.toggle('dk-off',!open('r'));
+  for(const s of ['l','r'])c[s].forEach((k,i)=>{const p=dkP[k];
+    p.style.gridColumn=s==='l'?'1':'5';p.style.gridRow=c[s].length===1?'1 / -1':(i===0?'1':'3');
+    p.classList.toggle('dk-l',s==='l');p.classList.toggle('dk-r',s==='r');});
+  const st=c.l.length===2?'l':c.r.length===2?'r':null;
+  let A='1fr',S='0px',B='0fr';
+  if(st){A=DOCK.split+'fr';B=(1-DOCK.split)+'fr';S='7px'}
+  rs.setProperty('--dkA',A);rs.setProperty('--dkS',S);rs.setProperty('--dkB',B);
+  sp.hidden=!(st&&S!=='0px');if(st)sp.style.gridColumn=st==='l'?'1':'5';
+}
+/* ширина на колоната и височина при два панела в една колона */
+{
+  const grip=(el,side)=>el.addEventListener('pointerdown',e=>{
+    if(!document.body.classList.contains('dock')||el.classList.contains('dk-off'))return;
+    e.preventDefault();e.stopImmediatePropagation();const k=uiK(),x0=e.clientX,w0=side==='l'?DOCK.wL:DOCK.wR;
+    el.setPointerCapture(e.pointerId);el.classList.add('drag');
+    const mv=ev=>{const w=w0+(side==='l'?1:-1)*(ev.clientX-x0)/k;if(side==='l')DOCK.wL=w;else DOCK.wR=w;dockApply()};
+    const up=()=>{el.classList.remove('drag');el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);
+      if(side==='l')DOCK.wL=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--dkL'))||DOCK.wL;else DOCK.wR=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--dkR'))||DOCK.wR;dockSave()};
+    el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up)},true);
+  grip($('#bmGrip'),'l');grip($('#bmGripR'),'r');
+  for(const [el,s] of [[$('#bmGrip'),'l'],[$('#bmGripR'),'r']])el.addEventListener('dblclick',e=>{if(!document.body.classList.contains('dock'))return;e.stopImmediatePropagation();if(s==='l')DOCK.wL=250;else DOCK.wR=250;dockSave();dockApply()},true);
+  const sp=$('#dockSplit');
+  sp.addEventListener('pointerdown',e=>{
+    const c=dockCols(),s=c.l.length===2?'l':'r',[a,b]=c[s];const ra=dkP[a].getBoundingClientRect(),rb=dkP[b].getBoundingClientRect();
+    e.preventDefault();sp.setPointerCapture(e.pointerId);sp.classList.add('drag');
+    const top=ra.top,tot=rb.bottom-ra.top;
+    const mv=ev=>{DOCK.split=Math.min(.85,Math.max(.15,(ev.clientY-top)/tot));dockApply()};
+    const up=()=>{sp.classList.remove('drag');sp.removeEventListener('pointermove',mv);sp.removeEventListener('pointerup',up);dockSave()};
+    sp.addEventListener('pointermove',mv);sp.addEventListener('pointerup',up)});
+  sp.addEventListener('dblclick',()=>{DOCK.split=.5;dockSave();dockApply()});
+}
+/* местене: влачене на заглавието до светнало място */
+{
+  let drag=null;
+  const zoneEl=(r,id)=>{const z=document.createElement('div');z.className='dk-zone';z.dataset.z=id;const k=uiK();
+    Object.assign(z.style,{left:r.left/k+'px',top:r.top/k+'px',width:r.width/k+'px',height:r.height/k+'px'});document.body.appendChild(z);return z};
+  const start=(k,e)=>{
+    const W=$('.work').getBoundingClientRect(),o=k==='sc'?'bm':'sc',zones=[];
+    const strip=Math.min(90,W.width*.12),R=(l,t,w,h)=>({left:l,top:t,width:w,height:h});
+    zones.push({id:'l',r:R(W.left,W.top,strip,W.height)},{id:'r',r:R(W.right-strip,W.top,strip,W.height)});
+    if(dkVis(o)){const r=dkP[o].getBoundingClientRect();zones.push({id:'above',r:R(r.left,r.top,r.width,r.height/2)},{id:'below',r:R(r.left,r.top+r.height/2,r.width,r.height/2)})}
+    const g=document.createElement('div');g.className='dk-ghost';const pr=dkP[k].getBoundingClientRect(),q=uiK();
+    Object.assign(g.style,{width:Math.min(pr.width,260)/q+'px',height:Math.min(pr.height,200)/q+'px'});g.innerHTML=dkP[k].querySelector('.bmside-h h3').outerHTML;document.body.appendChild(g);
+    drag={k,o,g,zones:zones.map(z=>({...z,el:zoneEl(z.r,z.id)})),hit:null};document.body.classList.add('dk-dragging');
+  };
+  const move=e=>{if(!drag)return;const q=uiK();drag.g.style.left=(e.clientX+12)/q+'px';drag.g.style.top=(e.clientY+12)/q+'px';
+    drag.hit=null;for(const z of drag.zones){const r=z.r,inside=e.clientX>=r.left&&e.clientX<=r.left+r.width&&e.clientY>=r.top&&e.clientY<=r.top+r.height;z.el.classList.toggle('hot',inside&&!drag.hit);if(inside&&!drag.hit)drag.hit=z.id}};
+  const end=()=>{if(!drag)return;const {k,o,hit}=drag;drag.g.remove();drag.zones.forEach(z=>z.el.remove());document.body.classList.remove('dk-dragging');drag=null;
+    if(!hit)return;
+    if(hit==='l'||hit==='r'){DOCK[k].side=hit;if(dkVis(o)&&DOCK[o].side===hit)DOCK.top=o}   /* пуснат на ръба: ако там вече има панел, застава под него */
+    else{DOCK[k].side=DOCK[o].side;DOCK.top=hit==='above'?k:o}
+    dockSave();dockApply()};
+  for(const k in dkP){const h=dkP[k].querySelector('.bmside-h h3 i');   /* хваща се само иконата на панела */
+    h.addEventListener('pointerdown',e=>{
+      if(!document.body.classList.contains('dock')||e.button!==0)return;e.preventDefault();
+      const x0=e.clientX,y0=e.clientY;let on=false;
+      const mv=ev=>{if(!on&&Math.hypot(ev.clientX-x0,ev.clientY-y0)>6){on=true;start(k,ev)}if(on)move(ev)};
+      const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);if(on)end()};
+      addEventListener('pointermove',mv);addEventListener('pointerup',up)})}
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&drag){drag.hit=null;end()}});
+}
+/* Reset UI: подредбата на панелите (места, ширини, височина) и мащабът на интерфейса се връщат към началните */
+$('#uiResetLayout').addEventListener('click',()=>{
+  Object.assign(DOCK,{sc:{side:'l'},bm:{side:'r'},top:'sc',wL:250,wR:250,split:.5});dockSave();
+  try{localStorage.setItem('tp.bmW','250');localStorage.setItem('tp.bmrW','250')}catch(e){oops('uiReset#1',e)}
+  document.documentElement.style.setProperty('--bmw','250px');document.documentElement.style.setProperty('--bmrw','250px');
+  set('uiScale',100);dockApply();
+});
+$('#dockSec').hidden=!IS_TAURI;   /* настройката е само в програмата за Windows */
+addEventListener('resize',()=>{try{dockApply()}catch(e){oops('dock#resize',e)}});
+dockApply();
+/* ==================== КРАЙ: Закачане на панелите ==================== */
+
 /* ---------- QR код (байтов режим, корекция L, версии 1–6) ---------- */
 const QR=(()=>{
   const EC=[null,[7,1],[10,1],[15,1],[20,1],[26,1],[18,2]];      // [кодови думи за корекция на блок, брой блокове]
@@ -7807,7 +8079,7 @@ const HOST=(()=>{
   }
   function layout(){
     const q=ps(),W=dims.W,H=dims.H,aw=wrap.clientWidth;if(!aw||!W||!H)return;
-    const ah=Math.max(140,Math.min(innerHeight*.6,640));
+    const ah=Math.max(140,Math.min(uiVH()*.6,640));
     const sc=Math.min(aw/W,ah/H);
     pvx.style.width=(W*sc)+'px';pvx.style.height=(H*sc)+'px';
     stg.style.width=W+'px';stg.style.height=H+'px';stg.style.transform='scale('+sc+')';
@@ -7962,8 +8234,8 @@ const HOST=(()=>{
     const mh=Math.min(menu.scrollHeight+2,320,vh-16);
     const below=vh-r.bottom-8,above=r.top-8;
     const top=(below>=Math.min(mh,200)||below>=above)?Math.min(r.bottom+4,vh-mh-8):Math.max(8,r.top-4-mh);
-    menu.style.maxHeight=Math.min(320,vh-16)+'px';menu.style.top=Math.max(8,top)+'px';
-    const mw=menu.offsetWidth;menu.style.left=Math.max(8,Math.min(r.left,vw-mw-8))+'px';
+    {const k=uiK();menu.style.maxHeight=Math.min(320*k,vh-16)/k+'px';menu.style.top=Math.max(8,top)/k+'px'}   /* в точки на интерфейса (мащаб) */
+    const mw=menu.getBoundingClientRect().width;menu.style.left=Math.max(8,Math.min(r.left,vw-mw-8))/uiK()+'px';
     const si=Math.max(0,sel.selectedIndex);setAct(si,true);
   }
   function enhance(sel){
