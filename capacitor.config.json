@@ -2,6 +2,7 @@
   "appId": "bg.tprompt.app",
   "appName": "TPrompt",
   "webDir": "www",
+  "backgroundColor": "#0c0f22",
   "server": {
     "androidScheme": "http",
     "cleartext": true
